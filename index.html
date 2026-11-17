@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Describing People – Interactive Learning Media</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e6f4ff;--card:#fff;--ink:#12304d;--sky:#2f9cf0;--sun:#ffd43b;--or:#ff8a3d;--ok:#2fb36b;--bad:#e5484d;--line:#a9d7f7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e2238;--card:#173653;--ink:#eaf4ff;--line:#2b557d}}
+:root[data-theme="dark"]{--bg:#0e2238;--card:#173653;--ink:#eaf4ff;--line:#2b557d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2",system-ui,"Segoe UI",sans-serif;font-size:1.2rem;line-height:1.4;min-height:100vh}
+.wrap{max-width:760px;margin:auto;padding:14px 16px 40px}
+.top{display:flex;justify-content:space-between;margin-bottom:12px}
+.btn{font:inherit;font-weight:800;background:var(--sun);color:#12304d;border:0;border-bottom:5px solid var(--or);border-radius:18px;padding:10px 22px;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:translateY(-3px) scale(1.04)}.btn:active{transform:translateY(2px)}
+.btn.sm{font-size:1rem;padding:6px 16px}.btn.xl{font-size:1.8rem;padding:14px 44px}
+button:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+.scr{animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h1{font-size:2.4rem;margin:.2em 0;line-height:1.1}h2{font-size:1.8rem;margin:.2em 0 .5em}
+.hero{text-align:center;padding:40px 0}.big{font-size:5rem}
+.card{background:var(--card);border:3px solid var(--line);border-radius:24px;padding:18px 22px;margin:12px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tile{font:inherit;font-weight:800;font-size:1.3rem;background:var(--card);color:var(--ink);border:3px solid var(--sky);border-bottom-width:7px;border-radius:24px;padding:22px 10px;cursor:pointer;transition:transform .15s,background .15s}
+.tile:hover{transform:translateY(-4px);background:var(--sun);color:#12304d}.tile span{display:block;font-size:2.6rem}
+.opt{display:block;width:100%;font:inherit;font-weight:700;background:var(--card);color:var(--ink);border:3px solid var(--line);border-radius:16px;padding:10px 14px;margin:8px 0;cursor:pointer;text-align:left;transition:transform .12s,background .12s}
+.opt:hover{background:var(--sun);color:#12304d;transform:scale(1.02)}
+.opt.sel{border-color:var(--or);background:var(--sun);color:#12304d}.opt.done{background:var(--ok);color:#fff;border-color:var(--ok)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chip{font:inherit;font-weight:700;background:var(--sun);color:#12304d;border:0;border-radius:999px;padding:6px 16px;margin:4px;cursor:pointer}
+.chip.on{background:var(--sky);color:#fff}
+.id{background:var(--sun);color:#12304d;border-radius:8px;padding:0 8px}.ds{background:var(--sky);color:#fff;border-radius:8px;padding:0 8px}
+.bl{font:inherit;font-weight:800;min-width:70px;background:var(--card);color:var(--ink);border:3px dashed var(--or);border-radius:12px;cursor:pointer}
+.msg{font-weight:800;min-height:1.6em}.ok{color:var(--ok)}.no{color:var(--bad)}
+.fbk{text-align:center;padding:30px 10px}.fbk .big{font-size:4.5rem}
+.st{position:fixed;bottom:25%;font-size:2rem;animation:up 1.1s ease-out forwards;pointer-events:none}
+@keyframes up{to{transform:translateY(-220px) rotate(40deg);opacity:0}}
+small{opacity:.8;font-weight:500}
+.shake{animation:shk .45s}
+@keyframes shk{20%{transform:translateX(-12px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
+@keyframes pop{from{transform:scale(.5);opacity:0}70%{transform:scale(1.12)}to{transform:scale(1);opacity:1}}
+@keyframes bob{50%{transform:translateY(-16px) rotate(6deg)}}
+@keyframes pls{50%{transform:scale(1.07)}}
+@keyframes wig{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+@keyframes gw{from{transform:scaleX(0)}}
+@keyframes grow{from{transform:scale(0)}to{transform:scale(var(--sx),var(--sy))}}
+@keyframes drift{to{transform:translateY(-120vh) rotate(25deg)}}
+.bob{display:inline-block;animation:bob 1.4s ease-in-out infinite}
+.btn.xl{animation:pls 1.6s ease-in-out infinite}
+.grid>.tile{animation:pop .45s backwards}
+.tile:hover span{animation:wig .5s}
+.bgi{position:absolute;bottom:-60px;opacity:.28;animation:drift linear infinite}
+.badges{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.bdg{font-size:1.8rem;filter:grayscale(1);opacity:.3}.bdg.got{filter:none;opacity:1;animation:pop .5s}
+.bar{height:14px;background:var(--line);border-radius:9px;overflow:hidden;margin-bottom:6px}.bar i{display:block;height:100%;transform-origin:left;background:linear-gradient(90deg,var(--sun),var(--or));animation:gw .6s}
+.stage{height:250px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;background:var(--card);border:3px solid var(--line);border-radius:24px;margin-bottom:10px;padding-bottom:8px}
+.av{transform-origin:bottom center;transform:scale(var(--sx),var(--sy));animation:grow .5s}.face{font-size:5rem;line-height:1}.acc{font-size:2rem}
+.mg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.mc{font:inherit;font-weight:800;font-size:1.05rem;height:84px;border-radius:16px;border:3px solid var(--sky);background:var(--sky);color:#fff;cursor:pointer;word-break:break-word}
+.mc.up{background:var(--card);color:var(--ink);animation:pop .35s}.mc.fnd{background:var(--ok);color:#fff;border-color:var(--ok)}
+@media (max-width:520px){h1{font-size:1.9rem}.grid,.cols{gap:10px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head>
+<body><div class="wrap" id="app"></div>
+<script>
+const app=document.getElementById("app");
+let cur="start",hist=[],co=-1,G,F,mt,fb,qi=0,sc=0,tried=false,fx=false,bd=new Set(),B,M,sh=false,last;
+const CH=[["👩","Ayu","long straight hair, brown eyes"],["👦","Budi","short hair, brown eyes"],["👧","Citra","short curly hair, black eyes"]];
+const CLUES=["She has long straight hair.","She has brown eyes.","She is kind and diligent."];
+const V=[["tall","tinggi"],["short","pendek"],["slim","langsing"],["curly hair","rambut keriting"],["straight hair","rambut lurus"],["brown eyes","mata cokelat"],["kind","baik hati"],["friendly","ramah"],["diligent","rajin"],["funny","lucu"]];
+const CARDS=[
+["📖 What &amp; Why",()=>`Descriptive text describes a person, place, or thing, so readers can “see” it in their minds.<br><small>Teks deskriptif menggambarkan orang, tempat, atau benda.</small>`],
+["🧱 Structure",()=>`<span class="id">Identification</span>: who is the person?<br><span class="ds">Description</span>: looks and character.<br><small>Identifikasi = siapa; Deskripsi = ciri fisik &amp; sifat.</small>`],
+["🔤 Vocabulary",()=>`Click a word to see its meaning.<br>`+V.map(v=>`<button class="chip" data-e="${v[0]}" data-i="${v[1]}" onclick="flip(this)">${v[0]}</button>`).join("")],
+["🧩 Sentence Patterns",()=>`He/She <b>is</b> + adjective<br>→ She is kind.<br>He/She <b>has</b> + noun<br>→ He has curly hair.`],
+["📝 Example Text",()=>`<b>My Friend, Rina</b><br><span class="id">Rina is my classmate. She is 13 years old.</span><br><span class="ds">She has long straight hair and brown eyes. She is tall and slim. She is kind and diligent.</span>`]];
+const Q=[
+{t:"mc",q:"She ___ long black hair.",o:["is","has","have","are"],a:1,e:"Remember: we use has for hair and eyes."},
+{t:"mc",q:"Which sentence is Identification?",o:["Her name is Sinta. She is my classmate.","She has curly hair.","She is very diligent.","She has brown eyes."],a:0,e:"Identification tells who the person is."},
+{t:"mc",q:"What is the opposite of “tall”?",o:["slim","short","kind","funny"],a:1,e:"Short (pendek) is the opposite of tall."},
+{t:"mc",q:"He ___ friendly.",o:["has","have","is","do"],a:2,e:"We use is before an adjective: He is friendly."},
+{t:"mc",q:"What is the purpose of descriptive text?",o:["To ask for help","To describe a person, place, or thing","To tell a funny joke","To give orders"],a:1,e:"Descriptive text describes a person, place, or thing."},
+{t:"mc",q:"Dika always finishes his homework. He is ___.",o:["lazy","funny","diligent","short"],a:2,e:"Diligent means rajin."},
+{t:"mc",q:"TRUE or FALSE: The Description part tells about looks and character.",o:["True","False"],a:0,e:"Description tells us physical appearance and character.",tf:1},
+{t:"mc",q:"TRUE or FALSE: “She have brown eyes.” is correct.",o:["True","False"],a:1,e:"With she/he we say has, not have.",tf:1},
+{t:"mt",q:"Match the word with its meaning.",p:[["slim","langsing"],["curly hair","rambut keriting"],["funny","lucu"]],e:"Check each pair again."},
+{t:"mt",q:"Match the opposites.",p:[["tall","short"],["curly","straight"],["diligent","lazy"]],e:"Think about opposite words."}];
+const shuf=a=>a.slice().sort(()=>Math.random()-.5);
+const initMt=(p,mode)=>{mt={p,R:shuf(p.map(x=>x[1])),sel:null,d:[],mode,msg:""}};
+function go(n){hist.push(cur);cur=n;if(n=="build")B={g:0,h:0,e:0,b:0,t:0,show:0};if(n=="mem")initMem();if(n=="core")co=-1;if(n=="guess")G={c:[0,0,0],p:-1};if(n=="fill")F={b:[null,null],msg:"",ok:0};if(n=="match")initMt([["🧑‍🦱","curly hair"],["📚","diligent"],["😂","funny"],["🤝","friendly"]],"free");draw()}
+function back(){cur=hist.pop()||"menu";draw()}
+function home(){hist=["start"];cur="menu";draw()}
+function stars(){for(let i=0;i<14;i++){const s=document.createElement("span");s.className="st";s.textContent=["⭐","🎉","✨","🎈"][i%4];s.style.left=(5+Math.random()*88)+"%";s.style.animationDelay=(Math.random()*.4)+"s";document.body.appendChild(s);setTimeout(()=>s.remove(),1700)}}
+function flip(b){const e=b.textContent==b.dataset.e;b.textContent=e?b.dataset.i:b.dataset.e;b.classList.toggle("on",e)}
+const mtHTML=()=>`<div class="cols"><div>${mt.p.map((x,i)=>`<button class="opt ${mt.d.includes(x[1])?"done":mt.sel===i?"sel":""}" onclick="mp(0,${i})">${x[0]}</button>`).join("")}</div><div>${mt.R.map((r,i)=>`<button class="opt ${mt.d.includes(r)?"done":""}" onclick="mp(1,${i})">${r}</button>`).join("")}</div></div><p class="msg">${mt.msg}</p>`;
+function mp(s,i){const p=mt.p;
+ if(s==0){if(!mt.d.includes(p[i][1]))mt.sel=i}
+ else if(mt.sel!=null&&!mt.d.includes(mt.R[i])){
+  if(p[mt.sel][1]===mt.R[i]){mt.d.push(mt.R[i]);mt.sel=null;mt.msg="Nice!";
+   if(mt.d.length==p.length){if(mt.mode=="quiz")return result(true);mt.msg="⭐ Great job! You matched them all!";fx=true;earn("match")}}
+  else{if(mt.mode=="quiz")return result(false);mt.msg="Almost there! Try another one.";mt.sel=null;sh=true}}
+ draw()}
+function pick(i){G.p=i;if(i==0){fx=true;earn("guess")}else sh=true;draw()}
+function fa(w){const i=F.b.indexOf(null);if(i>=0)F.b[i]=w;F.msg="";draw()}
+function fc(i){F.b[i]=null;F.msg="";draw()}
+function fk(){if(F.b.includes(null)){F.msg="Fill both blanks first!";F.ok=0}else if(F.b[0]=="has"&&F.b[1]=="is"){F.msg="⭐ Great job! You are a super describer!";F.ok=1;fx=true;earn("fill")}else{F.msg="Almost there! Remember: has for hair and eyes, is for adjectives.";F.ok=0;sh=true}draw()}
+const BD=[["guess","🕵️"],["match","🧩"],["fill","✏️"],["build","🎨"],["mem","🧠"],["quiz","⭐"]];
+const earn=k=>{if(!bd.has(k)){bd.add(k);fx=true}};
+const HS=[["long straight hair","👩","🧑"],["curly hair","👩‍🦱","👨‍🦱"],["short straight hair","👧","👦"]];
+const ES=[["brown eyes","🟤"],["black eyes","⚫"],["blue eyes","🔵"]];
+const BS=[["tall",1.35,1],["short",.8,1],["slim",1,.7]];
+const TS=[["kind","🤗"],["friendly","🤝"],["diligent","📚"],["funny","😂"]];
+const MP=[["🦒","tall"],["🐑","curly hair"],["🤗","kind"],["😂","funny"],["📚","diligent"],["🤝","friendly"]];
+function bs(k,i){B[k]=i;B.show=0;draw()}
+function bshow(){B.show=1;fx=true;earn("build");draw()}
+function initMem(){M={c:shuf(MP.flatMap((p,k)=>[{k,t:p[0]},{k,t:p[1]}])),o:[],f:[],mv:0,lk:0}}
+function mf(i){if(M.lk||M.o.includes(i)||M.f.includes(M.c[i].k))return;M.o.push(i);
+ if(M.o.length==2){M.mv++;const[a,b]=M.o;if(M.c[a].k==M.c[b].k){M.f.push(M.c[a].k);M.o=[];if(M.f.length==MP.length){fx=true;earn("mem")}}else{M.lk=1;sh=true;setTimeout(()=>{M.o=[];M.lk=0;if(cur=="mem")draw()},900)}}
+ draw()}
+function startQuiz(){hist.push(cur);qi=0;sc=0;tried=false;setQ()}
+function setQ(){last=null;const q=Q[qi];if(q.t=="mt")initMt(q.p,"quiz");cur="q";draw()}
+function ans(i){result(i==Q[qi].a)}
+function result(ok){if(ok&&!tried)sc++;tried=true;fb={ok,e:Q[qi].e};cur="fb";if(ok)fx=true;else sh=true;draw()}
+function nextQ(){qi++;tried=false;if(qi>=Q.length){cur="score";earn("quiz");draw()}else setQ()}
+const S={
+start:()=>`<div class="hero"><div class="big">🧑‍🎓✨</div><h1>Describing People</h1><p>Let’s describe our friends in English!<br><small>Ayo mendeskripsikan temanmu dalam bahasa Inggris!</small></p><button class="btn xl" onclick="go('menu')">▶ START</button></div>`,
+menu:()=>`<h2>Main Menu</h2><div class="grid">${[["goals","🎯","Learning Goals"],["core","📘","Core Material"],["guess","🕵️","Guess Who?"],["match","🧩","Match It!"],["fill","✏️","Complete the Text"]].map(m=>`<button class="tile" onclick="go('${m[0]}')"><span>${m[1]}</span>${m[2]}</button>`).join("")}<button class="tile" onclick="startQuiz()"><span>⭐</span>Quiz</button></div>`,
+goals:()=>`<h2>🎯 Learning Goals</h2><div class="card">1. Find <span class="id">Identification</span> and <span class="ds">Description</span> in a text.</div><div class="card">2. Use words for looks and character.</div><div class="card">3. Write 4–5 simple sentences about a person.</div><small>Tujuan: mengenali struktur, memakai kosakata, menulis 4–5 kalimat.</small>`,
+core:()=>`<h2>📘 Core Material</h2><div class="grid">${CARDS.map((c,i)=>`<button class="tile" style="padding:14px 8px;${co==i?"background:var(--sun);color:#12304d":""}" onclick="co=${i};draw()">${c[0]}</button>`).join("")}</div>${co>=0?`<div class="card scr">${CARDS[co][1]()}</div>`:`<p class="msg">Click a card to open it.</p>`}`,
+guess:()=>`<h2>🕵️ Guess Who?</h2><p>Click the clues one by one. Then choose!</p>${CLUES.map((c,i)=>`<button class="opt ${G.c[i]?"sel":""}" onclick="G.c[${i}]=1;draw()">${G.c[i]?c:"🔍 Clue "+(i+1)}</button>`).join("")}<div class="grid">${CH.map((c,i)=>`<button class="opt" style="text-align:center;${G.p==i?"background:"+(i==0?"var(--ok);color:#fff":"var(--bad);color:#fff"):""}" onclick="pick(${i})"><span style="font-size:2.6rem">${c[0]}</span><br>${c[1]}<br><small>${c[2]}</small></button>`).join("")}</div><p class="msg ${G.p==0?"ok":"no"}">${G.p==0?"⭐ Great job! It’s Ayu!":G.p>0?"Almost there! Check the clues again.":""}</p>`,
+match:()=>`<h2>🧩 Match It!</h2><p>Click a picture, then its word.</p>${mtHTML()}`,
+fill:()=>`<h2>✏️ Complete the Text</h2><div class="card">Rina is my best friend. She <button class="bl" onclick="fc(0)">${F.b[0]||"＿＿"}</button> long straight hair. She <button class="bl" onclick="fc(1)">${F.b[1]||"＿＿"}</button> kind and funny.</div><div>${["has","is","have"].map(w=>`<button class="chip" ${F.b.includes(w)?"disabled style='opacity:.4'":""} onclick="fa('${w}')">${w}</button>`).join("")}</div><p><button class="btn sm" onclick="fk()">CHECK</button></p><p class="msg ${F.ok?"ok":"no"}">${F.msg}</p>`,
+q:()=>{const q=Q[qi];return `<small>Question ${qi+1} / ${Q.length}</small><h2>${q.q}</h2>${q.t=="mt"?mtHTML():q.o.map((o,i)=>`<button class="opt" onclick="ans(${i})">${o}</button>`).join("")}`},
+fb:()=>fb.ok?`<div class="fbk"><div class="big">⭐</div><h2>Great job! You are a super describer!</h2><button class="btn xl" onclick="nextQ()">NEXT</button></div>`:`<div class="fbk"><div class="big">💪</div><h2>Almost there! ${fb.e} Try again!</h2><button class="btn xl" onclick="setQ()">TRY AGAIN</button></div>`,
+score:()=>`<div class="fbk"><div class="big">${"⭐".repeat(Math.max(1,Math.round(sc/2)))}</div><h1>${sc} / ${Q.length}</h1><div class="card" style="text-align:left"><b>Reflection</b><br>1. Which new words can you use for your friend?<br>2. What is easy? What is difficult?<br>3. Who will you describe next?</div><button class="btn" onclick="startQuiz()">PLAY AGAIN</button> <button class="btn" onclick="home()">🏠 HOME</button></div>`};
+function draw(){app.innerHTML=(cur=="start"?"":`<div class="top"><button class="btn sm" onclick="back()">◀ BACK</button><button class="btn sm" onclick="home()">🏠 HOME</button></div>`)+`<section class="scr${sh?" shake":""}">${S[cur]()}</section>`;if(last!=cur)window.scrollTo(0,0);last=cur;if(fx){fx=false;stars()}sh=false}
+const row=(k,a,f)=>`<div>${a.map((x,i)=>`<button class="chip ${B[k]==i?"on":""}" onclick="bs('${k}',${i})">${f(x)}</button>`).join("")}</div>`;
+S.start=()=>`<div class="hero"><div class="big bob">🧑‍🎓</div><h1>Describing People</h1><p>Let’s describe our friends in English!<br><small>Ayo mendeskripsikan temanmu dalam bahasa Inggris!</small></p><button class="btn xl" onclick="go('menu')">▶ START</button></div>`;
+S.menu=()=>`<h2>Main Menu</h2><div class="badges">${BD.map(b=>`<span class="bdg ${bd.has(b[0])?"got":""}">${b[1]}</span>`).join("")} <small>${bd.size}/${BD.length} badges</small></div><div class="grid">${[["goals","🎯","Learning Goals"],["core","📘","Core Material"],["guess","🕵️","Guess Who?"],["match","🧩","Match It!"],["fill","✏️","Complete the Text"],["build","🎨","Build a Friend"],["mem","🧠","Memory Game"]].map((m,i)=>`<button class="tile" style="animation-delay:${i*.06}s" onclick="go('${m[0]}')"><span>${m[1]}</span>${m[2]}</button>`).join("")}<button class="tile" style="animation-delay:.42s" onclick="startQuiz()"><span>⭐</span>Quiz</button></div>`;
+S.q=()=>{const q=Q[qi];return `<div class="bar"><i style="width:${(qi+1)/Q.length*100}%"></i></div><small>Question ${qi+1} / ${Q.length} 🏃</small><h2>${q.q}</h2>${q.t=="mt"?mtHTML():q.o.map((o,i)=>`<button class="opt" onclick="ans(${i})">${o}</button>`).join("")}`};
+S.build=()=>{const h=HS[B.h],e=ES[B.e],b=BS[B.b],t=TS[B.t],P=B.g?"He":"She";
+return `<h2>🎨 Build a Friend</h2><div class="stage"><div class="av" style="--sx:${b[2]};--sy:${b[1]}"><div class="face">${h[B.g?2:1]}</div></div><div class="acc">${e[1]} ${t[1]}</div></div>${row("g",["👧 She","👦 He"],x=>x)}${row("h",HS,x=>x[0])}${row("e",ES,x=>x[1]+" "+x[0])}${row("b",BS,x=>x[0])}${row("t",TS,x=>x[1]+" "+x[0])}<p><button class="btn sm" onclick="bshow()">✨ WRITE MY TEXT</button></p>${B.show?`<div class="card scr">This is my friend. ${P} has ${h[0]} and ${e[0]}. ${P} is ${b[0]}. ${P} is ${t[0]}.<br><small>Copy it! Add 1–2 more sentences.</small></div>`:""}`};
+S.mem=()=>`<h2>🧠 Memory Game</h2><p>Find each picture and its word. <small>Moves: ${M.mv}</small></p><div class="mg">${M.c.map((c,i)=>{const f=M.f.includes(c.k),v=f||M.o.includes(i);return `<button class="mc ${v?"up":""} ${f?"fnd":""}" onclick="mf(${i})">${v?c.t:"❓"}</button>`}).join("")}</div><p class="msg ok">${M.f.length==MP.length?"⭐ Great job! All found in "+M.mv+" moves!":""}</p>`;
+const bg=document.createElement("div");bg.style.cssText="position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none";
+for(let i=0;i<12;i++){const s=document.createElement("span");s.className="bgi";s.textContent=["☁️","⭐","🎈","✏️","📚","🌈"][i%6];s.style.cssText=`left:${Math.random()*95}%;animation-duration:${14+Math.random()*12}s;animation-delay:-${Math.random()*20}s;font-size:${1.6+Math.random()*1.6}rem`;bg.appendChild(s)}
+document.body.prepend(bg);
+draw();
+</script></body></html>
