@@ -10,7 +10,16 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2",system-ui,"Segoe UI",sans-serif;font-size:1.2rem;line-height:1.4;min-height:100vh}
-.wrap{max-width:760px;margin:auto;padding:14px 16px 40px}
+.wrap{max-width:760px;margin:auto;padding:14px 16px 96px}
+.fsb{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:50;width:54px;height:54px;padding:0;display:none;align-items:center;justify-content:center;font:inherit;background:var(--sun);color:#12304d;border:0;border-bottom:5px solid var(--or);border-radius:50%;cursor:pointer;box-shadow:0 4px 14px rgba(18,48,77,.25);transition:transform .15s}
+.fsb.can{display:flex}.fsb:hover{transform:translateY(-3px) scale(1.06)}.fsb:active{transform:translateY(2px)}
+.fsb svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.fsb .c{display:none}.fsb.on .e{display:none}.fsb.on .c{display:block}
+html:fullscreen,html:-webkit-full-screen{background:var(--bg);overflow:auto}
+html.fs .wrap{max-width:980px;padding-top:calc(18px + env(safe-area-inset-top,0px))}
+html.fs body{font-size:1.35rem}
+html.fs .stage{height:300px}
+@media (max-width:520px){html.fs body{font-size:1.2rem}}
 .top{display:flex;justify-content:space-between;margin-bottom:12px}
 .btn{font:inherit;font-weight:800;background:var(--sun);color:#12304d;border:0;border-bottom:5px solid var(--or);border-radius:18px;padding:10px 22px;cursor:pointer;transition:transform .15s}
 .btn:hover{transform:translateY(-3px) scale(1.04)}.btn:active{transform:translateY(2px)}
@@ -63,6 +72,7 @@ small{opacity:.8;font-weight:500}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head>
 <body><div class="wrap" id="app"></div>
+<button class="fsb" id="fsb" type="button" aria-pressed="false" aria-label="Layar penuh / Full screen" title="Layar penuh (F)"><svg class="e" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="c" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
 <script>
 const app=document.getElementById("app");
 let cur="start",hist=[],co=-1,G,F,mt,fb,qi=0,sc=0,tried=false,fx=false,bd=new Set(),B,M,sh=false,last;
@@ -145,5 +155,18 @@ S.mem=()=>`<h2>🧠 Memory Game</h2><p>Find each picture and its word. <small>Mo
 const bg=document.createElement("div");bg.style.cssText="position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none";
 for(let i=0;i<12;i++){const s=document.createElement("span");s.className="bgi";s.textContent=["☁️","⭐","🎈","✏️","📚","🌈"][i%6];s.style.cssText=`left:${Math.random()*95}%;animation-duration:${14+Math.random()*12}s;animation-delay:-${Math.random()*20}s;font-size:${1.6+Math.random()*1.6}rem`;bg.appendChild(s)}
 document.body.prepend(bg);
+// ---- Fullscreen mode ----
+(()=>{const b=document.getElementById("fsb"),d=document.documentElement;
+const req=d.requestFullscreen||d.webkitRequestFullscreen;
+const ex=document.exitFullscreen||document.webkitExitFullscreen;
+const isFs=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+if(!req||!(document.fullscreenEnabled||document.webkitFullscreenEnabled))return;
+b.classList.add("can");
+const sync=()=>{const on=isFs();d.classList.toggle("fs",on);b.classList.toggle("on",on);b.setAttribute("aria-pressed",on);const t=on?"Keluar layar penuh (F / Esc)":"Layar penuh (F)";b.title=t;b.setAttribute("aria-label",on?"Keluar layar penuh / Exit full screen":"Layar penuh / Full screen")};
+const toggle=()=>{try{const r=isFs()?ex.call(document):req.call(d);if(r&&r.catch)r.catch(()=>{})}catch(e){}};
+b.addEventListener("click",toggle);
+document.addEventListener("fullscreenchange",sync);document.addEventListener("webkitfullscreenchange",sync);
+document.addEventListener("keydown",e=>{if((e.key=="f"||e.key=="F")&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/INPUT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();toggle()}});
+})();
 draw();
 </script></body></html>
