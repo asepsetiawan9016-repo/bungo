@@ -199,6 +199,20 @@ html.fs .stage{height:340px}
 .mo:hover{transform:translateX(-3px)}
 .mo.on{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--card))}
 .mv{display:flex;align-items:center;gap:8px;margin:4px 4px 0}.mv input{flex:1;accent-color:var(--pur);height:28px}
+
+/* pronunciation */
+.pcard{background:var(--card);border:3px solid #ffd9a0;border-radius:28px;padding:18px 16px 16px;margin:12px 0;box-shadow:var(--shadow);text-align:center}
+.pw{font-family:"Fredoka","Baloo 2",system-ui,sans-serif;font-weight:600;font-size:2.7rem;line-height:1.05;color:var(--or);word-break:break-word}
+.ipa{display:inline-block;margin:8px 0 6px;padding:2px 18px;border-radius:999px;background:#e5dbff;color:#33217a;font-family:"Noto Sans","Segoe UI","DejaVu Sans","Charis SIL",system-ui,sans-serif;font-weight:600;font-size:1.25rem;letter-spacing:.02em}
+.pread{font-weight:700}.pread b{color:var(--sky);font-size:1.25em}
+.pmean{font-weight:800;margin-top:2px}
+.ptip{margin:10px auto 0;max-width:520px;padding:8px 14px;border-radius:18px;background:color-mix(in srgb,var(--sun) 28%,var(--card));border:2px dashed var(--sun);font-weight:600;text-align:left}
+.pbtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+.btn.mic{background:linear-gradient(180deg,#ff8aa8,#ee3f6f);color:#fff;border-bottom-color:#b81f4a;box-shadow:0 8px 14px rgba(184,31,74,.28)}
+.btn.mic.rec{animation:beat .9s ease-in-out infinite}
+.phead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pnav{display:flex;justify-content:space-between;gap:10px;margin-top:6px}
+@media (max-width:520px){.pw{font-size:2.2rem}.pbtns .btn{padding:8px 14px;flex:1 1 40%}}
 </style></head>
 <body><div class="wrap" id="app"></div>
 <button class="fsb can snd" id="snd" type="button" aria-pressed="true" aria-label="Suara menyala / Sound on" title="Suara (M)">🔊</button>
@@ -278,14 +292,14 @@ const QE=["Ingat: untuk rambut dan mata kita pakai has.","Identifikasi menyebutk
 let cur="start",hist=[],co=-1,G,F,mt,fb,qi=0,sc=0,tried=false,fx=false,bd=new Set(),B,M,sh=false,last;
 try{const s=JSON.parse(localStorage.getItem("dp")||"{}");nm=s.n||"";kl=s.k||"";bd=new Set(s.b||[]);wr=s.w||""}catch(e){}
 const save=()=>{try{localStorage.setItem("dp",JSON.stringify({n:nm,k:kl,b:[...bd],w:wr}))}catch(e){}};
-function say(t){try{const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function say(t,r){try{const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=r||.85;const v=pnVoice();if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 const CH=[["👩","Ayu","long straight hair, brown eyes",{h:0,e:"brown",g:0,s:0,a:"wave",l:"Ayu: long straight hair, brown eyes"}],["👦","Budi","short hair, brown eyes",{h:2,e:"brown",g:1,s:2,a:"thumb",l:"Budi: short hair, brown eyes"}],["👧","Citra","short curly hair, black eyes",{h:1,e:"black",g:0,s:1,a:"book",l:"Citra: short curly hair, black eyes"}]];
 const CLUES=["She has long straight hair.","She has brown eyes.","She is kind and diligent."];
 const V=[["tall","tinggi"],["short","pendek"],["slim","langsing"],["curly hair","rambut keriting"],["straight hair","rambut lurus"],["brown eyes","mata cokelat"],["kind","baik hati"],["friendly","ramah"],["diligent","rajin"],["funny","lucu"]];
 const CARDS=[
 ["📖 What &amp; Why",()=>`Descriptive text describes a person, place, or thing, so readers can “see” it in their minds.<br><small>Teks deskriptif menggambarkan orang, tempat, atau benda.</small>`],
 ["🧱 Structure",()=>`<span class="id">Identification</span>: who is the person?<br><span class="ds">Description</span>: looks and character.<br><small>Identifikasi = siapa; Deskripsi = ciri fisik &amp; sifat.</small>`],
-["🔤 Vocabulary",()=>`Click a word to see its meaning.<br><small>Klik kata untuk melihat artinya (klik lagi untuk kembali).</small><br>`+V.map(v=>`<button class="chip" data-e="${v[0]}" data-i="${v[1]}" onclick="flip(this)">${v[0]}</button>`).join("")],
+["🔤 Vocabulary",()=>`Click a word to see its meaning.<br><small>Klik kata untuk melihat artinya (klik lagi untuk kembali).</small><br>`+V.map(v=>`<button class="chip" data-e="${v[0]}" data-i="${v[1]}" onclick="flip(this)">${v[0]}</button>`).join("")+`<p><button class="btn sm mic" onclick="go('pron')">${bi("🗣️ Practice pronunciation","Latihan pengucapan")}</button></p>`],
 ["🧩 Sentence Patterns",()=>`He/She <b>is</b> + adjective<br>→ She is kind.<br>He/She <b>has</b> + noun<br>→ He has curly hair.<br><small>Pola kalimat: is + kata sifat (She is kind = Dia baik hati); has + kata benda (He has curly hair = Dia berambut keriting).</small>`],
 ["📝 Example Text",()=>`<div style="display:flow-root"><div style="float:right;width:120px;height:150px;margin:0 0 6px 12px">${avatar({h:0,e:"brown",g:0,s:1,a:"wave",l:"Rina: long straight hair, brown eyes"})}</div><b>My Friend, Rina</b> <button class="btn sm" aria-label="Listen / Dengarkan" onclick="say('Rina is my classmate. She is 13 years old. She has long straight hair and brown eyes. She is tall and slim. She is kind and diligent.')">🔊</button><br><span class="id">Rina is my classmate. She is 13 years old.</span><br><span class="ds">She has long straight hair and brown eyes. She is tall and slim. She is kind and diligent.</span><br><small>Kuning = Identifikasi (siapa orangnya). Biru = Deskripsi (ciri fisik &amp; sifat).<br>Terjemahan: Rina adalah teman sekelasku. Dia berumur 13 tahun. Dia berambut lurus panjang dan bermata cokelat. Dia tinggi dan langsing. Dia baik hati dan rajin.</small></div>`]];
 const Q=[
@@ -301,9 +315,9 @@ const Q=[
 {t:"mt",q:"Match the opposites.",p:[["tall","short"],["curly","straight"],["diligent","lazy"]],e:"Think about opposite words."}];
 const shuf=a=>a.slice().sort(()=>Math.random()-.5);
 const initMt=(p,mode)=>{mt={p,R:shuf(p.map(x=>x[1])),sel:null,d:[],mode,msg:""}};
-function go(n){hist.push(cur);cur=n;if(n=="build")B={g:0,h:0,e:0,b:0,t:0,show:0};if(n=="mem")initMem();if(n=="core")co=-1;if(n=="guess")G={c:[0,0,0],p:-1,o:shuf([0,1,2])};if(n=="fill")F={b:[null,null],msg:"",ok:0};wm="";if(n=="share")P={s:[],w:-1,n:""};if(n=="match")initMt([[ico("curly"),"curly hair"],[ico("diligent"),"diligent"],[ico("funny"),"funny"],[ico("friendly"),"friendly"]],"free");draw()}
-function back(){cur=hist.pop()||"menu";draw()}
-function home(){hist=["start"];cur="menu";draw()}
+function go(n){hist.push(cur);cur=n;if(n=="build")B={g:0,h:0,e:0,b:0,t:0,show:0};if(n=="mem")initMem();pnStop();if(n=="pron")PN={i:0,r:{},m:"",k:"",h:"",l:0,u:0};if(n=="core")co=-1;if(n=="guess")G={c:[0,0,0],p:-1,o:shuf([0,1,2])};if(n=="fill")F={b:[null,null],msg:"",ok:0};wm="";if(n=="share")P={s:[],w:-1,n:""};if(n=="match")initMt([[ico("curly"),"curly hair"],[ico("diligent"),"diligent"],[ico("funny"),"funny"],[ico("friendly"),"friendly"]],"free");draw()}
+function back(){pnStop();cur=hist.pop()||"menu";draw()}
+function home(){pnStop();hist=["start"];cur="menu";draw()}
 /* ---- Efek suara (WebAudio, tanpa file) ---- */
 let AC=null,muted=false;
 try{muted=localStorage.getItem("dps")=="0"}catch(e){}
@@ -337,7 +351,7 @@ function pick(i){G.p=i;if(i==0){fx=true;earn("guess")}else sh=true;draw()}
 function fa(w){const i=F.b.indexOf(null);if(i>=0)F.b[i]=w;F.msg="";draw()}
 function fc(i){F.b[i]=null;F.msg="";draw()}
 function fk(){if(F.b.includes(null)){F.msg=br("Fill both blanks first!","Isi kedua titik-titik dulu!");F.ok=0}else if(F.b[0]=="has"&&F.b[1]=="is"){F.msg=br("⭐ Great job! You are a super describer!","Hebat! Kamu pendeskripsi yang super!");F.ok=1;fx=true;earn("fill")}else{F.msg=br("Almost there! Remember: has for hair and eyes, is for adjectives.","Hampir benar! Ingat: has untuk rambut dan mata, is untuk kata sifat.");F.ok=0;sh=true}draw()}
-const BD=[["guess","🕵️"],["match","🧩"],["fill","✏️"],["build","🎨"],["mem","🧠"],["write","✍️"],["share","🤝"],["quiz","⭐"]];
+const BD=[["guess","🕵️"],["match","🧩"],["fill","✏️"],["pron","🗣️"],["build","🎨"],["mem","🧠"],["write","✍️"],["share","🤝"],["quiz","⭐"]];
 const earn=k=>{if(!bd.has(k)){bd.add(k);fx=true;save()}};
 const HSG=[["long straight hair","👩",0],["curly hair","👩‍🦱",1],["short straight hair","👧",2]];
 const HSB=[["short straight hair","👦",2],["short curly hair","👨‍🦱",1],["spiky hair","🧑",3]];
@@ -372,7 +386,7 @@ score:()=>`<div class="fbk"><div class="mascot">${avatar(Object.assign({},CH[0][
 function draw(){app.innerHTML=(cur=="start"?"":`<div class="top"><button class="btn sm back" onclick="back()">${bi("◀ BACK","Kembali")}</button><span class="pill" title="Badges / Lencana">🏅 ${bd.size}/${BD.length}</span><button class="btn sm" onclick="home()">${bi("🏠 HOME","Beranda")}</button></div>`)+`<section class="scr${sh?" shake":""}">${S[cur]()}</section>`;if(last!=cur){window.scrollTo(0,0);document.documentElement.scrollTop=0}last=cur;if(fx){fx=false;stars()}if(sh)setTimeout(()=>sfx("bad"),90);sh=false}
 const row=(k,a,f)=>`<div>${a.map((x,i)=>`<button class="chip ${B[k]==i?"on":""}" onclick="bs('${k}',${i})">${f(x)}</button>`).join("")}</div>`;
 S.start=()=>`<div class="hero"><div class="sunburst"></div><div class="chars">${CH.map((c,n)=>`<span class="ch c${n}">${avatar(c[3])}</span>`).join("")}</div><h1 class="ttl" aria-label="Describing People">${rb("Describing")}<br>${rb("People")}</h1><p class="sub">Let’s describe our friends in English!<br><small>Ayo mendeskripsikan temanmu dalam bahasa Inggris!</small></p><div class="card id-card" style="text-align:left;max-width:460px;margin:14px auto"><b>🪪 Identity <small>/ Identitas</small></b><br><small>English · Descriptive Text<br>Bahasa Inggris · Teks Deskriptif<br>Kelas IX (Fase D) · 2 pertemuan × 2 JP</small><label style="display:block;margin-top:8px">Name <small>/ Nama</small><input class="inp" maxlength="30" autocomplete="off" value="${esc(nm)}" oninput="nm=this.value;save()"></label><label style="display:block;margin-top:8px">Class <small>/ Kelas</small><input class="inp" maxlength="12" autocomplete="off" value="${esc(kl)}" oninput="kl=this.value;save()"></label></div><button class="btn xl" onclick="go('menu')">${bi("▶ START","Mulai")}</button></div>`;
-const MN=[["goals","🎯","Learning Goals","Tujuan Belajar","#ff8a3d"],["core","📘","Core Material","Materi Inti","#2f8cf5"],["guess","🕵️","Guess Who?","Tebak Siapa?","#7c5cf5"],["match","🧩","Match It!","Cocokkan!","#ff5fa2"],["fill","✏️","Complete the Text","Lengkapi Teks","#16b765"],["build","🎨","Build a Friend","Buat Temanmu","#10b3c4"],["mem","🧠","Memory Game","Permainan Memori","#f2a900"],["write","✍️","Write It!","Tulis Teksmu","#f0524f"],["share","🤝","Friend Feedback","Saling Beri Masukan","#6cc01a"]];
+const MN=[["goals","🎯","Learning Goals","Tujuan Belajar","#ff8a3d"],["core","📘","Core Material","Materi Inti","#2f8cf5"],["pron","🗣️","Pronunciation","Latihan Pengucapan","#e0457b"],["guess","🕵️","Guess Who?","Tebak Siapa?","#7c5cf5"],["match","🧩","Match It!","Cocokkan!","#ff5fa2"],["fill","✏️","Complete the Text","Lengkapi Teks","#16b765"],["build","🎨","Build a Friend","Buat Temanmu","#10b3c4"],["mem","🧠","Memory Game","Permainan Memori","#f2a900"],["write","✍️","Write It!","Tulis Teksmu","#f0524f"],["share","🤝","Friend Feedback","Saling Beri Masukan","#6cc01a"]];
 S.menu=()=>`<h2>Main Menu <small>/ Menu Utama</small></h2><p>Choose an activity to start learning.<br><small>Pilih kegiatan untuk mulai belajar. Kumpulkan semua lencana!</small></p><div class="badges">${BD.map(b=>`<span class="bdg ${bd.has(b[0])?"got":""}">${b[1]}</span>`).join("")} <small>${bd.size}/${BD.length} badges / lencana</small></div><div class="grid">${MN.map((m,i)=>`<button class="tile" style="--c:${m[4]};animation-delay:${i*.06}s" onclick="go('${m[0]}')"><span class="ib" aria-hidden="true">${m[1]}</span>${m[2]}<small>${m[3]}</small>${bd.has(m[0])?'<span class="t-tag" aria-label="Done / Selesai">✅</span>':""}</button>`).join("")}<button class="tile" style="--c:#ffb300;animation-delay:.6s" onclick="startQuiz()"><span class="ib" aria-hidden="true">⭐</span>Quiz<small>Kuis</small>${bd.has("quiz")?'<span class="t-tag" aria-label="Done / Selesai">✅</span>':""}</button></div>`;
 S.q=()=>{const q=Q[qi];return `<div class="bar"><i style="width:${(qi+1)/Q.length*100}%"></i></div><div class="qmeta"><small>Question / Soal ${qi+1} / ${Q.length} 🏃</small><span class="qtype">${q.t=="mt"?"Matching":q.tf?"True / False":"Multiple choice"}</span></div><p>${q.t=="mt"?br("Click an item on the left, then its match on the right.","Klik item di kiri, lalu pasangannya di kanan."):br("Choose the correct answer.","Pilih jawaban yang benar.")}</p><h2 class="qh">${q.q}<br><small>${QID[qi]}</small></h2>${q.t=="mt"?mtHTML():q.o.map((o,i)=>`<button class="opt" onclick="ans(${i})"><span class="lt" aria-hidden="true">${"ABCD"[i]}</span>${o}</button>`).join("")}`};
 S.build=()=>{const h=HL()[B.h],e=ES[B.e],b=BS[B.b],t=TS[B.t],P=B.g?"He":"She";
@@ -475,6 +489,65 @@ function musUI(){const L=document.getElementById("mlist"),b=document.getElementB
  musUI()})();
 document.getElementById("snd").addEventListener("click",sndToggle);
 document.addEventListener("keydown",e=>{if((e.key=="m"||e.key=="M")&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/INPUT|TEXTAREA/.test(e.target.tagName))sndToggle()});
+
+/* ---- Pronunciation / Latihan Pengucapan ---- */
+/* [kata, IPA (US), cara baca untuk penutur Indonesia, arti, tips] */
+const PV=[
+["tall","/tɔːl/","tol","tinggi","Bunyi “o” panjang dengan bibir membulat. Huruf “a” tidak dibaca “a”."],
+["short","/ʃɔːrt/","syort","pendek","Mulai dengan “sy” seperti pada “syukur”, bukan “s”."],
+["slim","/slɪm/","slim","langsing","Gabungan s–l di awal dibaca cepat dan menyatu: s-lim."],
+["curly hair","/ˈkɜːrli her/","KER-li her","rambut keriting","“ur” dibaca seperti “er” pada “kerja”. “hair” dibaca “her”, huruf “i” tidak berbunyi."],
+["straight hair","/streɪt her/","streit her","rambut lurus","“aigh” dibaca “ei”. Huruf “gh” tidak dibaca."],
+["brown eyes","/braʊn aɪz/","braun aiz","mata cokelat","“ow” dibaca “au”. Akhiran “s” pada eyes dibaca “z”."],
+["kind","/kaɪnd/","kaind","baik hati","Huruf “i” dibaca “ai”, bukan “i”."],
+["friendly","/ˈfrendli/","FREN-dli","ramah","Tekanan di suku kata pertama. “ie” dibaca “e”, bukan “i”."],
+["diligent","/ˈdɪlɪdʒənt/","DIL-i-jen","rajin","Huruf “g” dibaca “j”. Tekanan di suku kata pertama."],
+["funny","/ˈfʌni/","FA-ni","lucu","Huruf “u” dibaca seperti “a” pendek, bukan “u”."]];
+let PN={i:0,r:{},m:"",k:"",h:"",l:0,u:0},pRec=null;
+const SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
+function pnVoice(){try{const vs=speechSynthesis.getVoices();if(!vs.length)return null;const us=vs.filter(v=>/^en[-_]US/i.test(v.lang)),p=us.length?us:vs.filter(v=>/^en/i.test(v.lang));return p.find(v=>/google|natural|samantha|aria|jenny/i.test(v.name))||p[0]||null}catch(e){return null}}
+function pnStop(){try{speechSynthesis.cancel()}catch(e){}if(pRec){const r=pRec;pRec=null;try{r.abort()}catch(e){}}if(PN)PN.l=0}
+const pnDone=()=>Object.values(PN.r).filter(v=>v==2).length;
+function pnLev(a,b){const m=a.length,n=b.length,d=[];for(let i=0;i<=m;i++)d[i]=[i];for(let j=1;j<=n;j++)d[0][j]=j;
+ for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]==b[j-1]?0:1));return d[m][n]}
+function pnSay(n){say(PV[PN.i][0],n?.9:.5)}
+function pnPick(i){pnStop();PN.i=((i%PV.length)+PV.length)%PV.length;PN.m="";PN.k="";PN.h="";PN.l=0;draw();pnSay(1)}
+function pnLevel(l,heard){const k=PN.i;PN.r[k]=Math.max(PN.r[k]||0,l);PN.h=heard||"";
+ if(l==2){PN.k="ok";PN.m=br("⭐ Great! Your pronunciation is clear!","Hebat! Pengucapanmu sudah jelas!");setTimeout(()=>sfx("ok"),90)}
+ else if(l==1){PN.k="ok";PN.m=br("👍 Almost there! Listen again and try once more.","Hampir benar! Dengarkan lagi lalu coba sekali lagi.")}
+ else{PN.k="no";PN.m=br("Not yet. Listen carefully, then try again.","Belum tepat. Dengarkan baik-baik, lalu coba lagi.");sh=true}
+ if(pnDone()>=5)earn("pron");draw()}
+function pnSelf(l){PN.r[PN.i]=l;PN.h="";PN.k=l==2?"ok":l==1?"ok":"no";
+ PN.m=l==2?br("⭐ Great! Keep practicing!","Hebat! Terus berlatih!"):l==1?br("👍 Good try! Listen once more.","Usaha bagus! Dengarkan sekali lagi."):br("Listen again and repeat out loud.","Dengarkan lagi dan ucapkan dengan keras.");
+ if(l==2)setTimeout(()=>sfx("ok"),90);if(pnDone()>=5)earn("pron");draw()}
+function pnRec(){
+ if(PN.l){pnStop();draw();return}
+ if(!SRC){PN.u=1;draw();return}
+ const k=PN.i,t=PV[k][0].toLowerCase(),tn=t.replace(/ /g,"");
+ pnStop();let heard=null,err="";
+ const r=new SRC();r.lang="en-US";r.interimResults=false;r.continuous=false;r.maxAlternatives=5;
+ r.onresult=e=>{heard=[...e.results[0]].map(a=>a.transcript.toLowerCase().replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim()).filter(Boolean)};
+ r.onerror=e=>{err=e.error||"error"};
+ r.onend=()=>{if(pRec!==r)return;pRec=null;PN.l=0;if(cur!="pron"||PN.i!=k)return;
+  if(err=="not-allowed"||err=="service-not-allowed"){PN.k="no";PN.m=br("Microphone is blocked. Please allow microphone access.","Mikrofon diblokir. Izinkan akses mikrofon dulu.");return draw()}
+  if(err=="network"){PN.k="no";PN.m=br("No internet for voice check. Use self-check below.","Tidak ada internet untuk cek suara. Pakai penilaian sendiri di bawah.");PN.u=1;return draw()}
+  if(!heard||!heard.length){PN.k="no";PN.m=br("I couldn’t hear you. Move closer to the microphone and try again.","Suaramu tidak terdengar. Dekatkan mikrofon lalu coba lagi.");return draw()}
+  let best=0,hit=0;heard.forEach(h=>{const hn=h.replace(/ /g,"");if(hn.includes(tn))hit=1;const s=1-pnLev(hn,tn)/Math.max(hn.length,tn.length,1);if(s>best)best=s});
+  pnLevel(hit?2:best>=.7?1:0,heard[0])};
+ PN.l=1;PN.m="";PN.k="";PN.h="";pRec=r;
+ try{r.start()}catch(e){pRec=null;PN.l=0}
+ draw()}
+S.pron=()=>{const w=PV[PN.i],n=PV.length,dn=pnDone();
+ const chips=PV.map((v,i)=>`<button class="chip ${PN.i==i?"on":""}" aria-pressed="${PN.i==i}" onclick="pnPick(${i})">${PN.r[i]==2?"✅ ":PN.r[i]==1?"👍 ":""}${v[0]}</button>`).join("");
+ const self=(!SRC||PN.u)?`<p><b>Self-check <small>/ Periksa sendiri</small></b><br><small>Say the word out loud, then choose. / Ucapkan kata dengan keras, lalu pilih.</small></p><div><button class="chip" onclick="pnSelf(2)">😄 ${bi("Sounds right","Sudah mirip")}</button><button class="chip" onclick="pnSelf(1)">🙂 ${bi("Almost","Hampir")}</button><button class="chip" onclick="pnSelf(0)">🤔 ${bi("Again","Ulangi")}</button></div>`:"";
+ return `<h2>🗣️ Pronunciation <small>/ Latihan Pengucapan</small></h2><p>Listen, repeat, then speak. Master 5 words to earn a badge!<br><small>Dengarkan, tirukan, lalu ucapkan. Kuasai 5 kata untuk mendapat lencana!</small></p>
+ <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${dn}"><i style="width:${dn/n*100}%"></i></div><small>⭐ ${dn} / ${n} ${dn>=5?"🏅":""}</small>
+ <div>${chips}</div>
+ <div class="pcard scr"><div class="pw">${esc(w[0])}</div><div class="ipa" aria-label="IPA">${w[1]}</div><div class="pread">🗣️ <b>${w[2]}</b> <small>cara baca / how to read</small></div><div class="pmean">= ${w[3]}</div>
+ <div class="ptip">💡 ${w[4]}</div>
+ <div class="pbtns"><button class="btn" onclick="pnSay(1)">${br("🔊 Listen","Dengar")}</button><button class="btn back" onclick="pnSay(0)">${br("🐢 Slow","Pelan")}</button>${SRC?`<button class="btn mic ${PN.l?"rec":""}" onclick="pnRec()">${PN.l?br("⏹ Listening…","Mendengarkan…"):br("🎤 Speak","Ucapkan")}</button>`:""}</div></div>
+ <p role="status" class="msg ${PN.k}">${PN.m}${PN.h?`<br><small>Heard / Terdengar: “${esc(PN.h)}”</small>`:""}</p>${self}
+ <div class="pnav"><button class="btn sm back" onclick="pnPick(${PN.i-1})">${bi("◀ Prev","Sebelumnya")}</button><button class="btn sm" onclick="pnPick(${PN.i+1})">${bi("Next ▶","Berikutnya")}</button></div>`};
 sndSync();
 draw();
 </script></body></html>
