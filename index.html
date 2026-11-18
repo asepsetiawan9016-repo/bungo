@@ -367,11 +367,11 @@ function initMem(){M={c:shuf(MP.flatMap((p,k)=>[{k,t:p[0]},{k,t:p[1]}])),o:[],f:
 function mf(i){if(M.lk||M.o.includes(i)||M.f.includes(M.c[i].k))return;M.o.push(i);
  if(M.o.length==2){M.mv++;const[a,b]=M.o;if(M.c[a].k==M.c[b].k){M.f.push(M.c[a].k);M.o=[];setTimeout(()=>sfx("ok"),90);if(M.f.length==MP.length){fx=true;earn("mem")}}else{M.lk=1;sh=true;setTimeout(()=>{M.o=[];M.lk=0;if(cur=="mem")draw()},900)}}
  draw()}
-function startQuiz(){Q.forEach(q=>{if(q.t=="mc"&&!q.tf){q.c=q.c||q.o[q.a];q.o=shuf(q.o);q.a=q.o.indexOf(q.c)}});hist.push(cur);qi=0;sc=0;rf=-1;tried=false;setQ()}
+function startQuiz(){QS={s:"idle",id:""};Q.forEach(q=>{if(q.t=="mc"&&!q.tf){q.c=q.c||q.o[q.a];q.o=shuf(q.o);q.a=q.o.indexOf(q.c)}});hist.push(cur);qi=0;sc=0;rf=-1;tried=false;setQ()}
 function setQ(){last=null;const q=Q[qi];if(q.t=="mt")initMt(q.p,"quiz");cur="q";draw()}
 function ans(i){result(i==Q[qi].a)}
 function result(ok){if(ok&&!tried)sc++;tried=true;fb={ok,e:Q[qi].e};cur="fb";if(ok)fx=true;else sh=true;draw()}
-function nextQ(){qi++;tried=false;if(qi>=Q.length){cur="score";earn("quiz");draw()}else setQ()}
+function nextQ(){qi++;tried=false;if(qi>=Q.length){cur="score";earn("quiz");QS={s:"idle",id:""};draw();qSave()}else setQ()}
 const S={
 start:()=>`<div class="hero"><div class="big">🧑‍🎓✨</div><h1>Describing People</h1><p>Let’s describe our friends in English!<br><small>Ayo mendeskripsikan temanmu dalam bahasa Inggris!</small></p><button class="btn xl" onclick="go('menu')">▶ START</button></div>`,
 menu:()=>`<h2>Main Menu <small>/ Menu Utama</small></h2><div class="grid">${[["goals","🎯","Learning Goals","Tujuan Belajar"],["core","📘","Core Material","Materi Inti"],["guess","🕵️","Guess Who?","Tebak Siapa?"],["match","🧩","Match It!","Cocokkan!"],["fill","✏️","Complete the Text","Lengkapi Teks"]].map(m=>`<button class="tile" onclick="go('${m[0]}')"><span>${m[1]}</span>${m[2]}</button>`).join("")}<button class="tile" onclick="startQuiz()"><span>⭐</span>Quiz</button></div>`,
@@ -548,6 +548,41 @@ S.pron=()=>{const w=PV[PN.i],n=PV.length,dn=pnDone();
  <div class="pbtns"><button class="btn" onclick="pnSay(1)">${br("🔊 Listen","Dengar")}</button><button class="btn back" onclick="pnSay(0)">${br("🐢 Slow","Pelan")}</button>${SRC?`<button class="btn mic ${PN.l?"rec":""}" onclick="pnRec()">${PN.l?br("⏹ Listening…","Mendengarkan…"):br("🎤 Speak","Ucapkan")}</button>`:""}</div></div>
  <p role="status" class="msg ${PN.k}">${PN.m}${PN.h?`<br><small>Heard / Terdengar: “${esc(PN.h)}”</small>`:""}</p>${self}
  <div class="pnav"><button class="btn sm back" onclick="pnPick(${PN.i-1})">${bi("◀ Prev","Sebelumnya")}</button><button class="btn sm" onclick="pnPick(${PN.i+1})">${bi("Next ▶","Berikutnya")}</button></div>`};
+
+/* ---- Simpan hasil kuis ke Firebase (Firestore) ---- */
+/* ISI config proyek Firebase di bawah (Firebase Console → Project settings → Your apps → Config). */
+const FB_CONFIG={apiKey:"ISI_API_KEY",authDomain:"githhub-sekolah.firebaseapp.com",projectId:"githhub-sekolah",storageBucket:"githhub-sekolah.appspot.com",messagingSenderId:"ISI_SENDER_ID",appId:"ISI_APP_ID"};
+const FB_COL="hasil",FB_V="10.14.1",FB_JUDUL="Describing People",FB_KELAS="IX";
+let fbP=null,QS={s:"idle",id:""};
+const fbReady=()=>!/^ISI_/.test(FB_CONFIG.apiKey||"ISI_");
+const tmo=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),ms))]);
+function fbLoad(){return fbP||(fbP=Promise.all([import(`https://www.gstatic.com/firebasejs/${FB_V}/firebase-app.js`),import(`https://www.gstatic.com/firebasejs/${FB_V}/firebase-firestore.js`)]).then(([a,f])=>{const app=a.getApps().length?a.getApp():a.initializeApp(FB_CONFIG);return{db:f.getFirestore(app),f}}).catch(e=>{fbP=null;throw e}))}
+const qGet=()=>{try{return JSON.parse(localStorage.getItem("dpq")||"[]")}catch(e){return[]}};
+const qSet=a=>{try{localStorage.setItem("dpq",JSON.stringify(a))}catch(e){}};
+/* kirim semua antrean; id dokumen tetap, jadi percobaan ulang tidak membuat data ganda */
+async function qFlush(){const a=qGet();if(!a.length)return true;if(!fbReady())return false;
+ const{db,f}=await fbLoad(),left=[];
+ for(const it of a){try{await tmo(f.setDoc(f.doc(db,FB_COL,it.id),Object.assign({},it.d,{waktu:f.serverTimestamp()})),10000)}catch(e){left.push(it)}}
+ qSet(left);return !left.length}
+function qRender(){const e=document.getElementById("qst");if(e)e.innerHTML=qStat()}
+async function qSave(){
+ if(!nm.trim()){QS.s="noname";return qRender()}
+ if(!QS.id){QS.id="q"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  const a=qGet();a.push({id:QS.id,d:{nama:nm.trim(),kelas:kl.trim()||FB_KELAS,judul:FB_JUDUL,jenis:"kuis",skor:sc,total:Q.length,nilai:Math.round(sc/Q.length*100),tanggal:new Date().toISOString()}});qSet(a)}
+ QS.s="saving";qRender();
+ try{const ok=await qFlush();QS.s=ok?"ok":fbReady()?"err":"cfg"}catch(e){QS.s=fbReady()?"err":"cfg"}
+ qRender()}
+function qStat(){const s=QS.s;
+ if(s=="saving")return `<p role="status" class="msg">${br("☁️ Saving your result…","Menyimpan hasilmu…")}</p>`;
+ if(s=="ok")return `<p role="status" class="msg ok">${br("✅ Result saved! Your teacher can see it.","Hasil tersimpan! Gurumu dapat melihatnya.")}</p>`;
+ if(s=="noname")return `<div class="card" style="text-align:left"><b>☁️ Save your result <small>/ Simpan hasilmu</small></b><label style="display:block;margin-top:6px">Name <small>/ Nama</small><input class="inp" maxlength="30" autocomplete="off" value="${esc(nm)}" oninput="nm=this.value;save()"></label><label style="display:block;margin-top:6px">Class <small>/ Kelas</small><input class="inp" maxlength="12" autocomplete="off" value="${esc(kl)}" placeholder="${FB_KELAS}" oninput="kl=this.value;save()"></label><p><button class="btn sm" onclick="qSave()">${bi("☁️ Save result","Simpan hasil")}</button></p></div>`;
+ if(s=="err"||s=="cfg")return `<p role="status" class="msg no">${s=="cfg"?br("⚠️ Result is kept on this device. Tell your teacher.","Hasil tersimpan di perangkat ini. Beri tahu gurumu."):br("⚠️ Couldn’t send. Check your internet.","Gagal terkirim. Periksa internetmu.")}</p><p><button class="btn sm" onclick="qSave()">${bi("🔄 Try again","Coba lagi")}</button></p>`;
+ return ""}
+const _scoreS=S.score;
+S.score=()=>_scoreS().replace('<div class="card" style="text-align:left"><b>Reflection</b>','<div id="qst">'+qStat()+'</div><div class="card" style="text-align:left"><b>Reflection</b>');
+/* kirim ulang antrean yang tertunda saat internet kembali / halaman dibuka */
+window.addEventListener("online",()=>{qFlush().catch(()=>{})});
+if(qGet().length&&fbReady())setTimeout(()=>{qFlush().catch(()=>{})},2500);
 sndSync();
 draw();
 </script></body></html>
