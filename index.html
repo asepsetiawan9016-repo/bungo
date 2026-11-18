@@ -186,9 +186,24 @@ html.fs .stage{height:340px}
 .gimg{display:block;width:120px;height:150px}
 .gopt b{font-size:1.2rem}
 @media (max-width:520px){.gimg{width:92px;height:115px}}
+
+/* musik latar */
+.fsb.mus{bottom:max(142px,calc(env(safe-area-inset-bottom,0px) + 142px));font-size:1.5rem;line-height:1}
+.fsb.mus.on{background:linear-gradient(180deg,#8be8b0,#2fc77a);border-bottom-color:#0b8a4a;animation:beat 1s ease-in-out infinite}
+@keyframes beat{50%{transform:scale(1.09)}}
+.mpan{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(206px,calc(env(safe-area-inset-bottom,0px) + 206px));z-index:60;width:min(290px,calc(100vw - 28px));max-height:calc(100dvh - 230px);overflow:auto;background:var(--card);border:3px solid var(--line);border-radius:24px;padding:12px;box-shadow:var(--shadow);animation:in .25s ease}
+.mpan[hidden]{display:none}
+.mh{font-family:"Fredoka","Baloo 2",system-ui,sans-serif;font-weight:600;font-size:1.2rem;margin:0 4px 8px}
+.mo{display:flex;align-items:center;gap:10px;width:100%;font:inherit;font-weight:800;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:18px;padding:6px 12px;margin:0 0 7px;cursor:pointer;text-align:left;line-height:1.1;transition:transform .15s}
+.mo .ic{font-size:1.5rem}.mo small{display:block;font-weight:500}
+.mo:hover{transform:translateX(-3px)}
+.mo.on{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--card))}
+.mv{display:flex;align-items:center;gap:8px;margin:4px 4px 0}.mv input{flex:1;accent-color:var(--pur);height:28px}
 </style></head>
 <body><div class="wrap" id="app"></div>
 <button class="fsb can snd" id="snd" type="button" aria-pressed="true" aria-label="Suara menyala / Sound on" title="Suara (M)">🔊</button>
+<button class="fsb can mus" id="mus" type="button" aria-haspopup="true" aria-expanded="false" aria-pressed="false" aria-label="Musik / Music" title="Musik">🎵</button>
+<div class="mpan" id="mpan" role="dialog" aria-label="Pilih musik / Choose music" hidden><div class="mh">🎵 Musik <small>Music</small></div><div id="mlist"></div><label class="mv"><span aria-hidden="true">🔈</span><input type="range" id="mvol" min="0" max="100" step="5" aria-label="Volume musik / Music volume"></label></div>
 <button class="fsb" id="fsb" type="button" aria-pressed="false" aria-label="Layar penuh / Full screen" title="Layar penuh (F)"><svg class="e" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="c" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
 <script>
 const app=document.getElementById("app");
@@ -304,7 +319,7 @@ const SFX={
 function sfx(k){if(muted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state=="suspended")AC.resume();const n=AC.currentTime;
  (SFX[k]||[]).forEach(([f,t,d,w,v])=>{const o=AC.createOscillator(),g=AC.createGain();o.type=w;o.frequency.setValueAtTime(f,n+t);g.gain.setValueAtTime(v,n+t);g.gain.exponentialRampToValueAtTime(.0001,n+t+d);o.connect(g);g.connect(AC.destination);o.start(n+t);o.stop(n+t+d+.02)})}catch(e){}}
 function sndSync(){const b=document.getElementById("snd");if(!b)return;b.textContent=muted?"🔇":"🔊";b.setAttribute("aria-pressed",!muted);b.setAttribute("aria-label",muted?"Suara mati / Sound off":"Suara menyala / Sound on")}
-function sndToggle(){muted=!muted;try{localStorage.setItem("dps",muted?"0":"1")}catch(e){}sndSync();sfx("ok")}
+function sndToggle(){muted=!muted;try{localStorage.setItem("dps",muted?"0":"1")}catch(e){}sndSync();musApply();sfx("ok")}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("button");if(!b||b.id=="snd"||b.id=="fsb")return;
  sfx(b.classList.contains("tile")||b.classList.contains("xl")?"menu":b.classList.contains("back")||/home\(\)/.test(b.getAttribute("onclick")||"")?"back":b.classList.contains("mc")||b.classList.contains("chip")&&b.dataset.e?"flip":"tap")},true);
 function stars(){setTimeout(()=>sfx("win"),90);for(let i=0;i<12;i++){const s=document.createElement("span");s.className="st";s.textContent=["⭐","🎉","✨","🎈"][i%4];s.style.left=(5+Math.random()*88)+"%";s.style.animationDelay=(Math.random()*.4)+"s";document.body.appendChild(s);setTimeout(()=>s.remove(),1800)}
@@ -407,6 +422,57 @@ b.addEventListener("click",toggle);
 document.addEventListener("fullscreenchange",sync);document.addEventListener("webkitfullscreenchange",sync);
 document.addEventListener("keydown",e=>{if((e.key=="f"||e.key=="F")&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/INPUT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();toggle()}});
 })();
+/* ---- Musik latar (WebAudio, tanpa file) ---- */
+const MT={
+ sunny:{n:"Sunny Day",d:"Ceria & semangat",e:"☀️",bpm:116,root:60,w:"triangle",dr:1,
+  ch:[[0,"M"],[7,"M"],[9,"m"],[5,"M"],[0,"M"],[7,"M"],[9,"m"],[7,"M"]],
+  me:[[12,null,16,19,null,16,12,null],[14,null,19,23,null,19,14,null],[16,null,19,21,null,19,16,null],[17,19,21,19,17,null,12,null],
+      [19,19,16,null,19,21,19,null],[23,21,19,null,19,21,23,null],[21,19,16,null,12,16,19,null],[19,null,23,null,26,24,null,null]]},
+ play:{n:"Playground",d:"Riang & bersemangat",e:"🛝",bpm:132,root:55,w:"square",dr:1,
+  ch:[[0,"M"],[5,"M"],[7,"M"],[0,"M"],[0,"M"],[5,"M"],[7,"M"],[0,"M"]],
+  me:[[12,16,19,16,12,16,19,null],[17,21,24,21,17,21,24,null],[19,23,26,23,19,23,26,null],[24,null,19,null,16,null,12,null],
+      [19,19,null,19,21,23,null,null],[24,24,null,24,23,21,null,null],[23,21,19,null,21,23,26,null],[19,null,16,null,12,null,null,null]]},
+ chill:{n:"Santai",d:"Tenang untuk fokus",e:"🌿",bpm:92,root:53,w:"sine",dr:0,
+  ch:[[0,"M"],[7,"M"],[9,"m"],[5,"M"],[0,"M"],[7,"M"],[9,"m"],[7,"M"]],
+  me:[[12,null,16,null,19,null,16,null],[14,null,19,null,16,null,14,null],[21,null,17,null,16,null,12,null],[17,null,14,null,17,null,19,null],
+      [19,null,16,null,12,null,16,null],[19,null,16,null,14,null,16,null],[17,null,21,null,24,null,21,null],[19,null,16,null,14,null,null,null]]}
+};
+let mTrack=null,mVol=.6,mBus=null,mTimer=0,mNext=0,mStep=0,mNB=null;
+try{const k=localStorage.getItem("dpm");if(MT[k])mTrack=k;const v=parseFloat(localStorage.getItem("dpv"));if(v>=0&&v<=1)mVol=v}catch(e){}
+const mFreq=m=>440*Math.pow(2,(m-69)/12);
+function mNote(f,t,d,w,v){const o=AC.createOscillator(),g=AC.createGain();o.type=w;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(mBus);o.start(t);o.stop(t+d+.05)}
+function mHat(t,v){if(!mNB){mNB=AC.createBuffer(1,Math.floor(AC.sampleRate*.05),AC.sampleRate);const a=mNB.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=Math.random()*2-1}
+ const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=mNB;f.type="highpass";f.frequency.value=7000;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+.04);s.connect(f);f.connect(g);g.connect(mBus);s.start(t)}
+function mSched(){const T=MT[mTrack];if(!T||!mBus)return;const sp=30/T.bpm;
+ while(mNext<AC.currentTime+.35){const i=mStep%64,b=i>>3,p=i&7,t=mNext,iv=T.ch[b][1]=="m"?[0,3,7]:[0,4,7],base=T.root+T.ch[b][0],m=T.me[b][p];
+  if(m!=null)mNote(mFreq(T.root+m),t,sp*1.7,T.w,T.w=="square"?.05:.11);
+  if(T.dr){if(p==0||p==4)mNote(mFreq(base-12),t,sp*3,"sine",.2);if(p==2||p==6)iv.forEach(x=>mNote(mFreq(base+x),t,sp*1.3,"triangle",.035));mHat(t,p%2?.05:.03)}
+  else if(p==0){iv.forEach(x=>mNote(mFreq(base+x),t,sp*7.5,"sine",.045));mNote(mFreq(base-12),t,sp*7,"sine",.14)}
+  mNext+=sp;mStep++}}
+function musStop(){if(mTimer){clearInterval(mTimer);mTimer=0}
+ if(mBus){const o=mBus;mBus=null;try{o.gain.cancelScheduledValues(AC.currentTime);o.gain.setTargetAtTime(0,AC.currentTime,.08)}catch(e){}setTimeout(()=>{try{o.disconnect()}catch(e){}},700)}}
+function musApply(){musStop();musUI();if(!mTrack||muted||document.hidden)return;
+ try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state=="suspended")AC.resume();
+  mBus=AC.createGain();mBus.gain.setValueAtTime(0,AC.currentTime);mBus.gain.setTargetAtTime(mVol*.8,AC.currentTime,.25);mBus.connect(AC.destination);
+  mNext=AC.currentTime+.08;mStep=0;mSched();mTimer=setInterval(mSched,120)}catch(e){}}
+function musPick(k){mTrack=MT[k]?k:null;try{localStorage.setItem("dpm",mTrack||"off")}catch(e){}
+ if(mTrack&&muted){muted=false;try{localStorage.setItem("dps","1")}catch(e){}sndSync()}musApply()}
+function musUI(){const L=document.getElementById("mlist"),b=document.getElementById("mus");if(!L||!b)return;
+ L.innerHTML=Object.keys(MT).map(k=>`<button type="button" class="mo${mTrack==k?" on":""}" data-k="${k}" aria-pressed="${mTrack==k}"><span class="ic">${MT[k].e}</span><span>${MT[k].n}<small>${MT[k].d}</small></span></button>`).join("")+`<button type="button" class="mo${mTrack?"":" on"}" data-k="off" aria-pressed="${!mTrack}"><span class="ic">🔕</span><span>Matikan musik<small>Music off</small></span></button>`;
+ const on=!!mTrack&&!muted;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on)}
+(()=>{const b=document.getElementById("mus"),P=document.getElementById("mpan"),L=document.getElementById("mlist"),V=document.getElementById("mvol");
+ V.value=Math.round(mVol*100);
+ const shut=()=>{P.hidden=true;b.setAttribute("aria-expanded","false")};
+ b.addEventListener("click",()=>{P.hidden=!P.hidden;b.setAttribute("aria-expanded",!P.hidden)});
+ L.addEventListener("click",e=>{const o=e.target.closest(".mo");if(o)musPick(o.dataset.k)});
+ V.addEventListener("input",()=>{mVol=V.value/100;try{localStorage.setItem("dpv",mVol)}catch(e){}if(mBus&&AC)mBus.gain.setTargetAtTime(mVol*.8,AC.currentTime,.05)});
+ document.addEventListener("click",e=>{if(!P.hidden&&!P.contains(e.target)&&e.target!==b&&!b.contains(e.target))shut()});
+ document.addEventListener("keydown",e=>{if(e.key=="Escape"&&!P.hidden){shut();b.focus()}});
+ document.addEventListener("visibilitychange",musApply);
+ /* browser menahan audio sampai ada sentuhan pertama */
+ if(mTrack){const go1=()=>{["pointerdown","keydown","touchstart"].forEach(t=>document.removeEventListener(t,go1,true));if(!mTimer)musApply()};
+  ["pointerdown","keydown","touchstart"].forEach(t=>document.addEventListener(t,go1,true))}
+ musUI()})();
 document.getElementById("snd").addEventListener("click",sndToggle);
 document.addEventListener("keydown",e=>{if((e.key=="m"||e.key=="M")&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/INPUT|TEXTAREA/.test(e.target.tagName))sndToggle()});
 sndSync();
