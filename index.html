@@ -213,11 +213,19 @@ html.fs .stage{height:340px}
 .phead{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .pnav{display:flex;justify-content:space-between;gap:10px;margin-top:6px}
 @media (max-width:520px){.pw{font-size:2.2rem}.pbtns .btn{padding:8px 14px;flex:1 1 40%}}
+
+/* presenter */
+.fsb.pg{right:auto;left:max(14px,env(safe-area-inset-left,0px));font-size:1.5rem;line-height:1;opacity:.5}
+.fsb.pg:hover,.fsb.pg.on{opacity:1}
+.fsb.pg.on{background:linear-gradient(180deg,#c9b8ff,#7c5cf5);color:#fff;border-bottom-color:#4b34b8}
+.pgp:not(.pop){position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(78px,calc(env(safe-area-inset-bottom,0px) + 78px));z-index:60;width:min(360px,calc(100vw - 28px));max-height:calc(100dvh - 110px);overflow:auto;border:3px solid var(--pur);border-radius:22px;box-shadow:var(--shadow);animation:in .25s ease}
 </style></head>
 <body><div class="wrap" id="app"></div>
 <button class="fsb can snd" id="snd" type="button" aria-pressed="true" aria-label="Suara menyala / Sound on" title="Suara (M)">🔊</button>
 <button class="fsb can mus" id="mus" type="button" aria-haspopup="true" aria-expanded="false" aria-pressed="false" aria-label="Musik / Music" title="Musik">🎵</button>
 <div class="mpan" id="mpan" role="dialog" aria-label="Pilih musik / Choose music" hidden><div class="mh">🎵 Musik <small>Music</small></div><div id="mlist"></div><label class="mv"><span aria-hidden="true">🔈</span><input type="range" id="mvol" min="0" max="100" step="5" aria-label="Volume musik / Music volume"></label></div>
+<button class="fsb can pg" id="pgb" type="button" aria-pressed="false" aria-label="Panduan presenter / Presenter guide" title="Panduan presenter (P)">🎓</button>
+<div class="pgp" id="pgp" hidden></div>
 <button class="fsb" id="fsb" type="button" aria-pressed="false" aria-label="Layar penuh / Full screen" title="Layar penuh (F)"><svg class="e" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="c" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
 <script>
 const app=document.getElementById("app");
@@ -383,7 +391,7 @@ fill:()=>`<h2>✏️ Complete the Text <small>/ Lengkapi Teks</small></h2><p>Cli
 q:()=>{const q=Q[qi];return `<small>Question ${qi+1} / ${Q.length}</small><h2>${q.q}</h2>${q.t=="mt"?mtHTML():q.o.map((o,i)=>`<button class="opt" onclick="ans(${i})">${o}</button>`).join("")}`},
 fb:()=>fb.ok?`<div class="fbk"><div class="mascot">${avatar(Object.assign({},CH[qi%3][3],{a:"thumb",x:"smile"}))}</div><div class="big">⭐</div><h2>${PR[qi%5][0]}${nmC()}! You are a super describer!</h2><p><small>${PR[qi%5][1]}${nmC()}! Kamu pendeskripsi yang super!</small></p><div class="card" style="text-align:left">💡 ${fb.e}<br><small>${QE[qi]}</small></div><button class="btn xl" onclick="nextQ()">${bi("NEXT","Lanjut")}</button></div>`:`<div class="fbk"><div class="mascot">${avatar(Object.assign({},CH[qi%3][3],{a:"wave",x:"kind"}))}</div><div class="big">💪</div><h2>Almost there! ${fb.e} Try again!</h2><p><small>Hampir benar! ${QE[qi]} Coba lagi!</small></p><p>💪 ${br("Don’t give up"+nmC()+"! You can do it.","Jangan menyerah"+nmC()+"! Kamu pasti bisa.")}</p><button class="btn xl" onclick="setQ()">${bi("TRY AGAIN","Coba lagi")}</button></div>`,
 score:()=>`<div class="fbk"><div class="mascot">${avatar(Object.assign({},CH[0][3],{a:sc>=8?"thumb":"wave",x:sc>=8?"funny":"kind"}))}</div><div class="big">${"⭐".repeat(Math.max(1,Math.round(sc/2)))}</div><h1>${sc} / ${Q.length}</h1>${scInfo()}<div class="card" style="text-align:left"><b>Reflection</b><br>1. Which new words can you use for your friend?<br>2. What is easy? What is difficult?<br>3. Who will you describe next?<br><small>Refleksi: 1. Kata baru apa yang bisa kamu pakai untuk temanmu? 2. Apa yang mudah? Apa yang sulit? 3. Siapa yang akan kamu deskripsikan berikutnya?</small></div>${rfHTML()}<button class="btn" onclick="startQuiz()">${bi("PLAY AGAIN","Main lagi")}</button> <button class="btn" onclick="home()">${bi("🏠 HOME","Beranda")}</button></div>`};
-function draw(){app.innerHTML=(cur=="start"?"":`<div class="top"><button class="btn sm back" onclick="back()">${bi("◀ BACK","Kembali")}</button><span class="pill" title="Badges / Lencana">🏅 ${bd.size}/${BD.length}</span><button class="btn sm" onclick="home()">${bi("🏠 HOME","Beranda")}</button></div>`)+`<section class="scr${sh?" shake":""}">${S[cur]()}</section>`;if(last!=cur){window.scrollTo(0,0);document.documentElement.scrollTop=0}last=cur;if(fx){fx=false;stars()}if(sh)setTimeout(()=>sfx("bad"),90);sh=false}
+function draw(){app.innerHTML=(cur=="start"?"":`<div class="top"><button class="btn sm back" onclick="back()">${bi("◀ BACK","Kembali")}</button><span class="pill" title="Badges / Lencana">🏅 ${bd.size}/${BD.length}</span><button class="btn sm" onclick="home()">${bi("🏠 HOME","Beranda")}</button></div>`)+`<section class="scr${sh?" shake":""}">${S[cur]()}</section>`;if(last!=cur){window.scrollTo(0,0);document.documentElement.scrollTop=0}last=cur;if(fx){fx=false;stars()}if(sh)setTimeout(()=>sfx("bad"),90);sh=false;pgSync()}
 const row=(k,a,f)=>`<div>${a.map((x,i)=>`<button class="chip ${B[k]==i?"on":""}" onclick="bs('${k}',${i})">${f(x)}</button>`).join("")}</div>`;
 S.start=()=>`<div class="hero"><div class="sunburst"></div><div class="chars">${CH.map((c,n)=>`<span class="ch c${n}">${avatar(c[3])}</span>`).join("")}</div><h1 class="ttl" aria-label="Describing People">${rb("Describing")}<br>${rb("People")}</h1><p class="sub">Let’s describe our friends in English!<br><small>Ayo mendeskripsikan temanmu dalam bahasa Inggris!</small></p><div class="card id-card" style="text-align:left;max-width:460px;margin:14px auto"><b>🪪 Identity <small>/ Identitas</small></b><br><small>English · Descriptive Text<br>Bahasa Inggris · Teks Deskriptif<br>Kelas IX (Fase D) · 2 pertemuan × 2 JP</small><label style="display:block;margin-top:8px">Name <small>/ Nama</small><input class="inp" maxlength="30" autocomplete="off" value="${esc(nm)}" oninput="nm=this.value;save()"></label><label style="display:block;margin-top:8px">Class <small>/ Kelas</small><input class="inp" maxlength="12" autocomplete="off" value="${esc(kl)}" oninput="kl=this.value;save()"></label></div><button class="btn xl" onclick="go('menu')">${bi("▶ START","Mulai")}</button></div>`;
 const MN=[["goals","🎯","Learning Goals","Tujuan Belajar","#ff8a3d"],["core","📘","Core Material","Materi Inti","#2f8cf5"],["pron","🗣️","Pronunciation","Latihan Pengucapan","#e0457b"],["guess","🕵️","Guess Who?","Tebak Siapa?","#7c5cf5"],["match","🧩","Match It!","Cocokkan!","#ff5fa2"],["fill","✏️","Complete the Text","Lengkapi Teks","#16b765"],["build","🎨","Build a Friend","Buat Temanmu","#10b3c4"],["mem","🧠","Memory Game","Permainan Memori","#f2a900"],["write","✍️","Write It!","Tulis Teksmu","#f0524f"],["share","🤝","Friend Feedback","Saling Beri Masukan","#6cc01a"]];
@@ -583,6 +591,91 @@ S.score=()=>_scoreS().replace('<div class="card" style="text-align:left"><b>Refl
 /* kirim ulang antrean yang tertunda saat internet kembali / halaman dibuka */
 window.addEventListener("online",()=>{qFlush().catch(()=>{})});
 if(qGet().length&&fbReady())setTimeout(()=>{qFlush().catch(()=>{})},2500);
+
+/* ---- Panduan Presenter (peer teaching) ---- */
+/* Edit teks di bawah sesuai gayamu. s = kalimat yang diucapkan, d = yang dilakukan, m = menit, o = opsional */
+const PG=[
+{k:"start",t:"Pembukaan",m:2,s:"Good morning, everyone! Today we will learn how to describe people.",d:"Sapa kelas. Jika perlu, isi Name &amp; Class di kartu Identity, lalu tekan <b>START</b>."},
+{k:"goals",t:"Learning Goals",m:1,s:"By the end of this lesson, you can find the Identification and Description, use words for looks and character, and write 4–5 sentences.",d:"Buka <b>Learning Goals</b>, bacakan 4 tujuan. Tanya: “Do you understand?”"},
+{k:"core",t:"Core Material",m:5,s:"Let’s open the cards one by one.",d:"Buka kartu 1 → 5 secara berurutan. Petunjuk tiap kartu muncul di sini."},
+{k:"pron",t:"Pronunciation",m:3,s:"Listen and repeat after me.",d:"Tekan <b>🔊 Dengar</b>, kelas mengulang bersama. Lanjut <b>🐢 Pelan</b>. Panggil 2–3 peserta untuk <b>🎤 Ucapkan</b>."},
+{k:"guess",t:"Guess Who?",m:3,s:"Read the clues. Who is she?",d:"Buka petunjuk satu per satu, minta kelas menebak sebelum menekan gambar. Jawaban: <b>Ayu</b>."},
+{k:"match",t:"Match It!",m:2,s:"Match the picture with the word.",d:"Panggil peserta maju: pilih gambar, lalu pasangannya."},
+{k:"fill",t:"Complete the Text",m:2,s:"Choose “has” or “is”.",d:"Jawaban: <b>has → is</b>. Tanya alasannya: has untuk rambut/mata, is + kata sifat."},
+{k:"build",t:"Build a Friend",m:3,o:1,s:"Let’s build our own friend. What does he or she look like?",d:"Pilih ciri sesuai usulan kelas, tekan <b>WRITE MY TEXT</b>, baca teksnya bersama."},
+{k:"mem",t:"Memory Game",m:3,o:1,s:"Find the picture and its word.",d:"Selingan ringan. Mainkan 1 ronde bersama kelas."},
+{k:"write",t:"Write It!",m:5,s:"Write 4–5 sentences about a real friend.",d:"Beri waktu 3–4 menit, keliling membantu. Ingatkan ceklis di bagian bawah."},
+{k:"share",t:"Friend Feedback",m:3,s:"Swap texts with a friend. Give two stars and one wish.",d:"Pasangkan peserta. Pilih 2 bintang + 1 harapan dengan kata yang santun."},
+{k:"quiz",t:"Quiz &amp; Reflection",m:5,s:"Let’s check what we learned.",d:"Tekan <b>Quiz</b>, kerjakan 10 soal. Di halaman skor, minta peserta memilih perasaan (refleksi), lalu tutup dengan pujian."}];
+const CQ=[
+["1 What &amp; Why","A descriptive text describes a person, place, or thing.","Tanya: “Why do we describe people?” Lalu buka kartu 2."],
+["2 Structure","It has two parts: Identification and Description.","Tunjuk warna <b>kuning</b> (Identification: siapa) dan <b>biru</b> (Description: ciri &amp; sifat)."],
+["3 Vocabulary","Click a word to see the meaning.","Klik chip satu per satu; minta kelas menebak arti dulu. Untuk berlatih ucapan, tekan tombol <b>Latihan pengucapan</b> di bawah kartu."],
+["4 Sentence Patterns","Use “has” for hair and eyes. Use “is” for character.","Contoh: She has long hair. She is kind. Minta 2 peserta membuat kalimat."],
+["5 Example Text","Let’s read about Rina.","Tekan 🔊 untuk membacakan. Minta kelas menunjuk kalimat Identification dan Description."]];
+let PGI=0,PGO=false,PGW=null,PGS=false,pgT=0,pgRun=false;
+const PGB=`.pgp{background:var(--card);color:var(--ink);padding:12px 14px;font:600 1rem/1.35 "Baloo 2",system-ui,sans-serif}
+.pgp .pgh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.pgp .pgt{display:flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums;font-weight:800}
+.pgp button{font:inherit;font-weight:800;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:4px 10px;cursor:pointer}
+.pgp button.pri{background:var(--pur);border-color:var(--pur);color:#fff}
+.pgp button:disabled{opacity:.4;cursor:default}
+.pgp .dots{display:flex;gap:4px;margin:4px 0 8px}.pgp .dots i{flex:1;height:6px;border-radius:4px;background:var(--line)}.pgp .dots i.dn{background:var(--ok)}.pgp .dots i.on{background:var(--or)}
+.pgp .pgs{font-size:.85rem;color:var(--ink2)}
+.pgp .pgttl{font-family:Fredoka,"Baloo 2",system-ui,sans-serif;font-size:1.35rem;font-weight:600;margin:2px 0 6px}
+.pgp .pgb{border-radius:14px;padding:8px 12px;margin:6px 0}.pgp .pgb small{display:block;font-weight:800;opacity:.8}
+.pgp .pgsay{background:#e5dbff;color:#2a1a6b}.pgp .pgdo{background:#fff0a8;color:#5a4000}
+.pgp .pgnx{margin:8px 0;font-size:.95rem}
+.pgp .pgbt{display:flex;gap:8px}.pgp .pgbt button{flex:1;padding:8px 10px}
+.pgp .pgck{display:block;margin-top:8px;font-size:.9rem}
+.pgp .pgft{margin-top:8px;font-size:.8rem;color:var(--ink2)}`;
+{const s=document.createElement("style");s.textContent=PGB;document.head.appendChild(s)}
+const pgIdx=c=>c=="q"||c=="fb"||c=="score"?PG.findIndex(p=>p.k=="quiz"):PG.findIndex(p=>p.k==c);
+const pgFmt=()=>String(Math.floor(pgT/60)).padStart(2,"0")+":"+String(pgT%60).padStart(2,"0");
+function pgNx(dir){let i=PGI+dir;while(i>=0&&i<PG.length&&PGS&&PG[i].o)i+=dir;return i>=0&&i<PG.length?i:-1}
+function pgCue(){const p=PG[PGI],nx=pgNx(1);
+ if(cur=="menu")return{t:"Main Menu",s:"Next, let’s do the next activity!",d:nx>=0?`Pilih kegiatan: <b>${PG[nx].t}</b> (atau tekan <b>Lanjut ▶</b>).`:"Semua kegiatan selesai. Tutup dengan pujian dan salam."};
+ if(p.k=="core"&&co>=0&&CQ[co])return{t:p.t+" · "+CQ[co][0],s:CQ[co][1],d:CQ[co][2]};
+ if(p.k=="quiz"&&cur=="q")return{t:p.t,s:"Choose the correct answer.",d:"Beri waktu menjawab. Setelah jawab, tekan <b>NEXT</b>."};
+ if(p.k=="quiz"&&cur=="score")return{t:"Reflection",s:"How do you feel about today’s lesson?",d:"Bacakan skor, minta peserta memilih perasaan (refleksi). Tutup: “Thank you, see you!”"};
+ return p}
+function pgHTML(pre){const c=pgCue(),n=PG.length,nx=pgNx(1),pv=pgNx(-1),p=PG[PGI];
+ return `<div class="pgh"><b>🎓 Presenter</b><span class="pgt"><span id="pgT">${pgFmt()}</span><button type="button" title="Start / pause" onclick="${pre}pgTog()">${pgRun?"⏸":"▶"}</button><button type="button" title="Reset" onclick="${pre}pgRst()">↺</button></span></div>
+<div class="dots">${PG.map((q,i)=>`<i class="${i==PGI?"on":i<PGI?"dn":""}"></i>`).join("")}</div>
+<div class="pgs">Langkah ${PGI+1}/${n}${p.o?" · opsional":""} · ± ${p.m} menit</div>
+<div class="pgttl">${c.t}</div>
+<div class="pgb pgsay"><small>🗣️ Katakan</small>${c.s}</div>
+<div class="pgb pgdo"><small>👉 Lakukan</small>${c.d}</div>
+<div class="pgnx">Berikutnya: <b>${nx>=0?PG[nx].t:"Selesai 🎉"}</b></div>
+<div class="pgbt"><button type="button" ${pv<0?"disabled":""} onclick="${pre}pgGo(-1)">◀ Sebelumnya</button><button type="button" class="pri" ${nx<0?"disabled":""} onclick="${pre}pgGo(1)">Lanjut ▶</button></div>
+<label class="pgck"><input type="checkbox" ${PGS?"checked":""} onchange="${pre}pgShort(this.checked)"> Mode singkat (lewati langkah opsional)</label>
+<div class="pgft">${pre?"":`<button type="button" onclick="pgPop()">↗ Buka di jendela terpisah</button><br>`}→ / PageDown = lanjut · ← / PageUp = kembali · P = tampil/sembunyi</div>`}
+function pgRender(){const P=document.getElementById("pgp"),b=document.getElementById("pgb");if(!P)return;
+ if(PGW&&PGW.closed)PGW=null;const pop=!!PGW;
+ b.classList.toggle("on",PGO||pop);b.setAttribute("aria-pressed",PGO||pop);
+ P.hidden=!PGO||pop;if(!P.hidden)P.innerHTML=pgHTML("");
+ if(pop){const r=PGW.document.getElementById("r");if(r)r.innerHTML=pgHTML("opener.")}}
+function pgSync(){const i=pgIdx(cur);if(i>=0)PGI=i;pgRender()}
+function pgGo(dir){const i=pgNx(dir);if(i<0)return;PGI=i;const k=PG[i].k;
+ if(k=="start"){pnStop();hist=[];cur="start";draw()}else if(k=="quiz")startQuiz();else go(k)}
+function pgShort(v){PGS=!!v;pgRender()}
+function pgTog(){pgRun=!pgRun;pgRender()}
+function pgRst(){pgT=0;pgRun=false;pgRender()}
+function pgToggle(){if(PGW&&!PGW.closed){PGW.focus();return}PGO=!PGO;pgRender()}
+function pgPop(){if(PGW&&!PGW.closed){PGW.focus();return}
+ let w=null;try{w=window.open("","dpPresenter","width=440,height=700")}catch(e){}
+ if(!w){alert("Pop-up diblokir. Izinkan pop-up untuk halaman ini, atau pakai panel di layar.\nPop-up blocked: please allow pop-ups.");return}
+ PGW=w;PGO=false;w.document.open();
+ w.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Presenter – Describing People</title><link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@500;600&display=swap" rel="stylesheet"><style>:root{--card:#fff;--ink:#1d2b53;--ink2:#4b5a85;--line:#cfe2f7;--pur:#7c5cf5;--or:#ff8a3d;--ok:#12a461}body{margin:0;background:#fff}.pgp{min-height:100vh;box-sizing:border-box}${PGB}</style></head><body><div class="pgp pop" id="r"></div></body></html>`);
+ w.document.close();w.addEventListener("keydown",pgKey);pgRender()}
+function pgKey(e){if(e.ctrlKey||e.metaKey||e.altKey)return;if(/INPUT|TEXTAREA|SELECT/.test((e.target&&e.target.tagName)||""))return;
+ const k=e.key,on=PGO||(PGW&&!PGW.closed);
+ if((k=="p"||k=="P")&&e.currentTarget===document){e.preventDefault();pgToggle();return}
+ if(!on)return;
+ if(k=="ArrowRight"||k=="PageDown"){e.preventDefault();pgGo(1)}else if(k=="ArrowLeft"||k=="PageUp"){e.preventDefault();pgGo(-1)}}
+document.addEventListener("keydown",pgKey);
+document.getElementById("pgb").addEventListener("click",pgToggle);
+setInterval(()=>{if(!pgRun)return;pgT++;const t=pgFmt();[document,PGW&&!PGW.closed?PGW.document:null].forEach(d=>{const e=d&&d.getElementById("pgT");if(e)e.textContent=t})},1000);
 sndSync();
 draw();
 </script></body></html>
