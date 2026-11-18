@@ -177,6 +177,14 @@ html.fs .wrap{max-width:1000px;padding-top:calc(18px + env(safe-area-inset-top,0
 html.fs .stage{height:340px}
 @media (max-width:520px){html.fs body{font-size:1.15rem}}
 .fsb.snd{bottom:max(78px,calc(env(safe-area-inset-bottom,0px) + 78px));font-size:1.5rem;line-height:1}
+
+/* tombol lanjut antar materi & kegiatan */
+.nxb{position:sticky;bottom:max(10px,env(safe-area-inset-bottom,0px));z-index:30;display:flex;gap:10px;align-items:center;justify-content:space-between;margin:18px 70px 0 0;padding:8px 10px;background:var(--card);border:3px solid var(--line);border-radius:26px;box-shadow:var(--shadow)}
+.nxb .btn{white-space:nowrap}
+.nxb .btn.nx{flex:1;background:linear-gradient(180deg,#52e08e,#16b765);color:#fff;border-bottom-color:#0b8a4a;box-shadow:0 8px 14px rgba(11,138,74,.28);text-shadow:0 2px 0 rgba(0,0,0,.18);font-size:1.15rem}
+.nxb .btn.nx small{color:#e9fff3;opacity:.9}
+.nxb .st{position:static;animation:none;font-size:.85rem;font-weight:800;color:var(--ink2);white-space:nowrap;pointer-events:auto}
+@media (max-width:520px){.nxb{margin-right:62px;gap:6px;padding:6px 8px}.nxb .btn{padding:8px 12px}.nxb .btn.nx{font-size:1rem}.nxb .st{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .btn small{color:inherit;opacity:.75}.btn.xl small{opacity:.9}
 .qh::after{display:none}.qh{display:block}.qh small{display:block;font-size:1rem;margin-top:2px}
@@ -391,7 +399,23 @@ fill:()=>`<h2>✏️ Complete the Text <small>/ Lengkapi Teks</small></h2><p>Cli
 q:()=>{const q=Q[qi];return `<small>Question ${qi+1} / ${Q.length}</small><h2>${q.q}</h2>${q.t=="mt"?mtHTML():q.o.map((o,i)=>`<button class="opt" onclick="ans(${i})">${o}</button>`).join("")}`},
 fb:()=>fb.ok?`<div class="fbk"><div class="mascot">${avatar(Object.assign({},CH[qi%3][3],{a:"thumb",x:"smile"}))}</div><div class="big">⭐</div><h2>${PR[qi%5][0]}${nmC()}! You are a super describer!</h2><p><small>${PR[qi%5][1]}${nmC()}! Kamu pendeskripsi yang super!</small></p><div class="card" style="text-align:left">💡 ${fb.e}<br><small>${QE[qi]}</small></div><button class="btn xl" onclick="nextQ()">${bi("NEXT","Lanjut")}</button></div>`:`<div class="fbk"><div class="mascot">${avatar(Object.assign({},CH[qi%3][3],{a:"wave",x:"kind"}))}</div><div class="big">💪</div><h2>Almost there! ${fb.e} Try again!</h2><p><small>Hampir benar! ${QE[qi]} Coba lagi!</small></p><p>💪 ${br("Don’t give up"+nmC()+"! You can do it.","Jangan menyerah"+nmC()+"! Kamu pasti bisa.")}</p><button class="btn xl" onclick="setQ()">${bi("TRY AGAIN","Coba lagi")}</button></div>`,
 score:()=>`<div class="fbk"><div class="mascot">${avatar(Object.assign({},CH[0][3],{a:sc>=8?"thumb":"wave",x:sc>=8?"funny":"kind"}))}</div><div class="big">${"⭐".repeat(Math.max(1,Math.round(sc/2)))}</div><h1>${sc} / ${Q.length}</h1>${scInfo()}<div class="card" style="text-align:left"><b>Reflection</b><br>1. Which new words can you use for your friend?<br>2. What is easy? What is difficult?<br>3. Who will you describe next?<br><small>Refleksi: 1. Kata baru apa yang bisa kamu pakai untuk temanmu? 2. Apa yang mudah? Apa yang sulit? 3. Siapa yang akan kamu deskripsikan berikutnya?</small></div>${rfHTML()}<button class="btn" onclick="startQuiz()">${bi("PLAY AGAIN","Main lagi")}</button> <button class="btn" onclick="home()">${bi("🏠 HOME","Beranda")}</button></div>`};
-function draw(){app.innerHTML=(cur=="start"?"":`<div class="top"><button class="btn sm back" onclick="back()">${bi("◀ BACK","Kembali")}</button><span class="pill" title="Badges / Lencana">🏅 ${bd.size}/${BD.length}</span><button class="btn sm" onclick="home()">${bi("🏠 HOME","Beranda")}</button></div>`)+`<section class="scr${sh?" shake":""}">${S[cur]()}</section>`;if(last!=cur){window.scrollTo(0,0);document.documentElement.scrollTop=0}last=cur;if(fx){fx=false;stars()}if(sh)setTimeout(()=>sfx("bad"),90);sh=false;pgSync()}
+
+/* ---- tombol Lanjut antar materi & kegiatan (untuk siswa) ---- */
+let _FL=null;
+function flow(){if(!_FL){const t={quiz:["📝 Quiz","Kuis"]};MN.forEach(m=>t[m[0]]=[m[1]+" "+m[2],m[3]]);_FL={a:[...MN.map(m=>m[0]),"quiz"],t}}return _FL}
+function nxHTML(){
+ const FLOW=flow().a,FLOWT=flow().t;
+ const i=FLOW.indexOf(cur);if(i<0)return "";
+ const n=FLOW[i+1],pv=FLOW[i-1];
+ let main;
+ if(cur=="core"&&co<CARDS.length-1)main=`<button class="btn nx" onclick="nxCard()">${co<0?bi("▶ Open card 1","Buka kartu 1"):bi("Next card ▶","Kartu berikutnya")}</button>`;
+ else main=`<button class="btn nx" onclick="nxGo()">${bi("Next ▶","Lanjut")}<br><small>${FLOWT[n][0]}</small></button>`;
+ const prev=pv?`<button class="btn sm back" onclick="nxPrev()" aria-label="Sebelumnya">◀</button>`:"";
+ return `<div class="nxb">${prev}${main}<span class="st">${i+1} / ${FLOW.length}</span></div>`}
+function nxCard(){co++;draw()}
+function nxGo(){const FLOW=flow().a,i=FLOW.indexOf(cur),n=FLOW[i+1];if(!n)return;if(n=="quiz")startQuiz();else go(n)}
+function nxPrev(){const FLOW=flow().a,i=FLOW.indexOf(cur),p=FLOW[i-1];if(p)go(p)}
+function draw(){app.innerHTML=(cur=="start"?"":`<div class="top"><button class="btn sm back" onclick="back()">${bi("◀ BACK","Kembali")}</button><span class="pill" title="Badges / Lencana">🏅 ${bd.size}/${BD.length}</span><button class="btn sm" onclick="home()">${bi("🏠 HOME","Beranda")}</button></div>`)+`<section class="scr${sh?" shake":""}">${S[cur]()}</section>`+nxHTML();if(last!=cur){window.scrollTo(0,0);document.documentElement.scrollTop=0}last=cur;if(fx){fx=false;stars()}if(sh)setTimeout(()=>sfx("bad"),90);sh=false;pgSync()}
 const row=(k,a,f)=>`<div>${a.map((x,i)=>`<button class="chip ${B[k]==i?"on":""}" onclick="bs('${k}',${i})">${f(x)}</button>`).join("")}</div>`;
 S.start=()=>`<div class="hero"><div class="sunburst"></div><div class="chars">${CH.map((c,n)=>`<span class="ch c${n}">${avatar(c[3])}</span>`).join("")}</div><h1 class="ttl" aria-label="Describing People">${rb("Describing")}<br>${rb("People")}</h1><p class="sub">Let’s describe our friends in English!<br><small>Ayo mendeskripsikan temanmu dalam bahasa Inggris!</small></p><div class="card id-card" style="text-align:left;max-width:460px;margin:14px auto"><b>🪪 Identity <small>/ Identitas</small></b><br><small>English · Descriptive Text<br>Bahasa Inggris · Teks Deskriptif<br>Kelas IX (Fase D) · 2 pertemuan × 2 JP</small><label style="display:block;margin-top:8px">Name <small>/ Nama</small><input class="inp" maxlength="30" autocomplete="off" value="${esc(nm)}" oninput="nm=this.value;save()"></label><label style="display:block;margin-top:8px">Class <small>/ Kelas</small><input class="inp" maxlength="12" autocomplete="off" value="${esc(kl)}" oninput="kl=this.value;save()"></label></div><button class="btn xl" onclick="go('menu')">${bi("▶ START","Mulai")}</button></div>`;
 const MN=[["goals","🎯","Learning Goals","Tujuan Belajar","#ff8a3d"],["core","📘","Core Material","Materi Inti","#2f8cf5"],["pron","🗣️","Pronunciation","Latihan Pengucapan","#e0457b"],["guess","🕵️","Guess Who?","Tebak Siapa?","#7c5cf5"],["match","🧩","Match It!","Cocokkan!","#ff5fa2"],["fill","✏️","Complete the Text","Lengkapi Teks","#16b765"],["build","🎨","Build a Friend","Buat Temanmu","#10b3c4"],["mem","🧠","Memory Game","Permainan Memori","#f2a900"],["write","✍️","Write It!","Tulis Teksmu","#f0524f"],["share","🤝","Friend Feedback","Saling Beri Masukan","#6cc01a"]];
